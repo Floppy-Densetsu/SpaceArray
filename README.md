@@ -22,6 +22,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Contribution guidelines ###
 
+Well, there is this 1800-line "fire3" method that could probably be broken up into a few parts. The whole thing is a rickety example of amateur efforts.
 * Writing tests
 * Code review
 * Other guidelines
