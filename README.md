@@ -4,15 +4,15 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* Quick summary
+* Quick summary: 
     I haven't thought this far into things. It's just a place to make the code accessible.
-* Version
+* Version: 
     0.1 - Steps to determine incremental checkpoints have not yet been determined.
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### How do I get set up? ###
 
-* Summary of set up
+* Summary of set up: 
     Umm, it's written in Java, for now.
 * Configuration
 * Dependencies
