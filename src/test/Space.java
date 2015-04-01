@@ -23,8 +23,16 @@ public class Space {
     Boolean[][] face;
 
     public Space() {
-        STATES = 4;
-        BASE = 3;
+        this(3, 4);
+    }
+
+    public Space(int size) {
+        this(size, 4);
+    }
+
+    public Space(int size, int states) {
+        STATES = states;
+        BASE = size;
         BASE2 = (int) Math.pow(BASE, 2);
         BASE3 = (int) Math.pow(BASE, 3);
         face = new Boolean[STATES][BASE3];
@@ -39,29 +47,6 @@ public class Space {
             faceIn[i] = false;
             faceOut[i] = false;
         }
-    }
-
-    public Space(int size) {
-        STATES = 4;
-        BASE = size;
-        BASE2 = (int) Math.pow(BASE, 2);
-        BASE3 = (int) Math.pow(BASE, 3);
-        face = new Boolean[4][BASE3];
-        faceIn = new Boolean[BASE3];
-        faceOut = new Boolean[BASE3];
-
-        for (int j = 0; j < STATES; j++) {
-            for (int i = 0; i < BASE3; i++) {
-                face[j][i] = false;
-            }
-        }
-        for (int i = 0; i < BASE3; i++) {
-
-            faceIn[i] = false;
-            faceOut[i] = false;
-        }
-
-
     }
 
     public void testStates() {
@@ -104,7 +89,7 @@ public class Space {
         }
     }
 
-    
+
 
     public void process2() {
         if (BASE == 3) {
