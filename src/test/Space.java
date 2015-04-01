@@ -22,6 +22,15 @@ public class Space {
     Boolean[] faceOut;
     Boolean[][] face;
 
+    int[] maps = new int[] {
+        0, 19, 20, 5, 4,
+        23, 2, 1, 26, 11,
+        10, 17, 12, 13, 14,
+        9, 16, 15, 0, 25,
+        24, 3, 22, 21, 6,
+        7, 18
+    };
+
     public Space() {
         this(3, 4);
     }
