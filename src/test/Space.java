@@ -107,7 +107,11 @@ public class Space {
                     if (faceIn[i] == true) {
                         faceIn[i] = false;
 
-                        faceOut[mapsBase3[i]] = true;
+                        int out = mapsBase3[i];
+
+                        if (out >= 0) {
+                            faceOut[] = true;
+                        }
                     }
                 }
             } else {
