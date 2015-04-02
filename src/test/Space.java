@@ -114,14 +114,14 @@ public class Space {
 
     public void passThru() {
         for (int i = 0; i < BASE3; i++) {
-            if (faceIn[i] == true) {
-                if (faceIn[(BASE3 - 1) - i] == true) {
-                    faceIn[i] = false;
-                    faceIn[(BASE3 - 1) - i] = false;
-                } else {
-                    faceIn[i] = false;
+            if (faceIn[i]) {
+                faceIn[i] = false;
+
+                if (!faceIn[(BASE3 - 1) - i]) {
                     faceOut[(BASE3 - 1) - i] = true;
                 }
+
+                faceIn[(BASE3 - 1) - i] = false;
             }
         }
     }
