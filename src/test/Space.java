@@ -117,10 +117,10 @@ public class Space {
             if (faceIn[i]) {
                 faceIn[i] = false;
 
-                if (faceIn[(BASE3 - 1) - i]) {
-                    faceIn[(BASE3 - 1) - i] = false;
-                } else {
+                if (!faceIn[(BASE3 - 1) - i]) {
                     faceOut[(BASE3 - 1) - i] = true;
+                } else {
+                    faceIn[(BASE3 - 1) - i] = false;
                 }
             }
         }
