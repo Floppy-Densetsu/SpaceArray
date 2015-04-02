@@ -7,11 +7,16 @@ package test;
 /**
  *
  * @author Flopp_000
+ * 
+ * Gonna try to design this one to show things in a particular way
+ * and do some stuff based on user input.
+ * 
+ * It doesn't do anything different right now.
  */
 import java.awt.image.*;
 import java.awt.*;
 
-public class Test implements Runnable {
+public class ColorTest implements Runnable {
 
     /**
      * @param args the command line arguments
@@ -89,7 +94,7 @@ public class Test implements Runnable {
         java.util.Arrays.fill(counter, 0);
         //space[MAXZ - 1][4][1].faceIn[19] = true;
         // space[0][3][1].faceIn[11] = true;
-        loop = new Thread(new Test());
+        loop = new Thread(new ColorTest());
         loop.start();
 
     }
@@ -653,90 +658,6 @@ public class Test implements Runnable {
         }
     }
 
-    public static void drawMap2(int startX, int startY) {
-        g2d.clearRect(0, 0, spaceMap.getWidth(), spaceMap.getHeight());
-        int drawX = startX;
-        int drawY = startY + 12;
-        int q = 0;
-        //int counter = 1;
-        //Color newColor = new Color(0, 0, 0);
-        // g2d.drawString("BLAHBLAH", 100, 100);
-        // g2d.fillRect(50, 50, 100, 100);
-        for (int y = 0; y < MAXY; y++) {
-
-            for (int i = 0; i < (BASE); i++) {
-                for (int z = MAXZ - 1; z >= 0; z--) {
-                    for (int x = 0; x < MAXX; x++) {
-                        for (int j = (i * BASE2); j < (i * BASE2) + BASE2; j++) {
-                            int layer = ((j - (j % BASE2)) / BASE2);
-                            q = space[z][y][x].faceIn[j] ? 35 : (64 + j);
-                            //q = space[z][y][x].faceIn[j] ? 35 : (32);
-                            if (q == 35) {
-                                g2d.setColor(Color.CYAN);
-                                spaceMap.setRGB(drawX + ((x * BASE2) + ((j % BASE2))), drawY + (y * (MAXZ * BASE)) + (layer * z) + layer, Color.CYAN.getRGB());
-
-                            } else {
-                                g2d.setColor(inColor);
-                            }
-                            //g2d.drawString("" + (char) q, drawX + ((x * 108) + ((j % BASE2) * 12)), drawY);
-
-                            q = space[z][y][x].faceOut[j] ? 35 : (64 + j);
-                            //q = space[z][y][x].faceOut[j] ? 35 : (32);
-                            if (q == 35) {
-                                g2d.setColor(Color.CYAN);
-                                spaceMap.setRGB(drawX + ((x * BASE2) + ((j % BASE2))), drawY + (y * (MAXZ * BASE)) + (layer * z) + layer, Color.MAGENTA.getRGB());
-
-                            } else {
-                                g2d.setColor(outColor);
-                            }
-                            //g2d.drawString("" + (char) q, drawX + ((x * 108) + ((j % BASE2) * 12) + 6), drawY);
-
-
-                        }
-                    }
-                    // drawY += 1;
-                }
-                //drawY += 1;
-            }
-        }
-    }
-
-    public static void drawMap(int startX, int startY) {
-        g2d.clearRect(startX, startY, startX + 755, startY + 390);
-        int drawX = startX;
-        int drawY = startY + 12;
-        int q = 0;
-        for (int y = 0; y < MAXY; y++) {
-
-            for (int i = 0; i < (BASE); i++) {
-                for (int z = MAXZ - 1; z >= 0; z--) {
-                    for (int x = 0; x < MAXX; x++) {
-                        for (int j = (i * BASE2); j < (i * BASE2) + BASE2; j++) {
-                            // g2d.fillRect(drawX + ((x*100)+((j%9)*10)), drawY, 5, 5);
-                            q = space[z][y][x].faceIn[j] ? 35 : (64 + j);
-                            if (q == 35) {
-                                g2d.setColor(Color.CYAN);
-                            } else {
-                                g2d.setColor(inColor);
-                            }
-                            g2d.drawString("" + (char) q, drawX + ((x * 240) + ((j % BASE2) * 15)), drawY);
-                            q = space[z][y][x].faceOut[j] ? 35 : (64 + j);
-                            if (q == 35) {
-                                g2d.setColor(Color.CYAN);
-                            } else {
-                                g2d.setColor(outColor);
-                            }
-                            g2d.drawString("" + (char) q, drawX + ((x * 240) + ((j % BASE2) * 15) + 7), drawY);
-
-                        }
-                    }
-                    drawY += 7;
-                }
-                drawY += 7;
-            }
-        }
-    }
-
     public static void start() {
         loop = new Thread();
         loop.start();
@@ -1111,94 +1032,61 @@ public class Test implements Runnable {
                                             modz = 0;
                                         }
 
-                                        if (i % BASE2 < BASE) { //if i is on the front face
-                                            if (i < BASE) { //if i is in the top row
-                                                if (i % BASE == 0) { //if i is on the left
-                                                    /*
-                                                    since the space being checked is in the top left front corner of the
-                                                    whole universe box, something heading out of the top left front corner
-                                                    of this space will bounce against the corner and I just have it go back
-                                                    the way it came for ease of operation, rather than sending it somewhere
-                                                    else and making things even more complicated.
-                                                    */                                               
-                                                    
+                                        if (i % BASE2 < BASE) {
+                                            if (i < BASE) {
+                                                if (i % BASE == 0) {
+                                                    space[z][y][x].faceOut[i] = false;
                                                     space[z][y][x].faceIn[i] = true;
 
-                                                } else if ((i + 1) % BASE == 0) { //if i is on the right instead
-                                                    /*
-                                                    Same top front left corner piece, with something moving out of its
-                                                    top front right corner. So I made it pass over to the neighboring
-                                                    space's top front left input as if the energy had bounced against 
-                                                    and interior edge, reversing its Y and Z directions while keeping
-                                                    the X direction the same. So it enters into 0 on the neightbor.
-                                                    */
+                                                } else if ((i + 1) % BASE == 0) {
+
                                                     if (space[z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
                                                         space[z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
                                                     } else {
                                                         reboundSpace(i, z, y, x);
                                                     }
-                                                } else if (i == (BASE - 1) - i) { //else if i is in the center of the top front edge
-                                                    /*
-                                                    bounce back into itself
-                                                    */
-                                                    
+                                                } else if (i == (BASE - 1) - i) {
+                                                    space[z][y][x].faceOut[i] = false;
                                                     space[z][y][x].faceIn[i] = true;
-                                                } else { //else it will be on one side or the other of the center, but not on a side edge
-                                                    /*
-                                                    bounce back into its mirror face. This makes a sort of 2d spiral
-                                                    along these faces as they constantly cross back and forth.
-                                                    */
+                                                } else {
                                                     if (space[z][y][x].faceOut[(BASE3 - 1) - i] == false) {
                                                         space[z][y][x].faceIn[(BASE3 - 1) - i] = true;
                                                     } else {
                                                         reboundSpace(i, z, y, x);
                                                     }
                                                 }
-                                            } else if (i % BASE == 0) { //on the front, not the top, if on the left
-                                                if (i == (BASE3 - BASE2)) { //if it is the bottom front left corner
-                                                    /*
-                                                    invert Z and X factors while maintaining Y. Bounce off front left edge
-                                                    into face 0 of the space below.
-                                                    */
+                                            } else if (i % BASE == 0) {
+                                                if (i == (BASE3 - BASE2)) {
                                                     if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
                                                         space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
                                                     } else {
                                                         reboundSpace(i, z, y, x);
                                                     }
-                                                } else if (i == (BASE3 - BASE2) - i) { //else if center of front left edge
+                                                } else if (i == (BASE3 - BASE2) - i) {
                                                     space[z][y][x].faceIn[i] = true;
-                                                } else { //else bounce into mirror face along front left edge
+                                                } else {
                                                     if (space[z][y][x].faceOut[(BASE3 - BASE2) - i] == false) {
                                                         space[z][y][x].faceIn[(BASE3 - BASE2) - i] = true;
                                                     } else {
                                                         reboundSpace(i, z, y, x);
                                                     }
                                                 }
-                                            } else if (i == (BASE3 - BASE2) + (BASE - 1) - i) { //else if in center of front face.
-                                                //again, bounce off of the Z0 wall and back into itself
+                                            } else if (i == (BASE3 - BASE2) + (BASE - 1) - i) {
                                                 space[z][y][x].faceIn[i] = true;
-                                            } else { //else it is somewhere on the front face
-                                                /*
-                                                no need to discern whether it is on the right or the bottom edges.
-                                                The mod determination will send it to the right space, and they all
-                                                will get mapped to 104-i on whatever space they head to, even if 
-                                                they are bouncing off the Z0 wall and back into their mirror.
-                                                I probably can even leave out the previous "else if".
-                                                */
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if (i < BASE2) { //if i is on the top side instead of front.
-                                            if (i % BASE == 0) { //if i is on the left
-                                                if (i == (BASE2 - BASE) - i) { //if it is on the center of top left edge. 10
+                                        } else if (i < BASE2) {
+                                            if (i % BASE == 0) {
+                                                if (i == (BASE2 - BASE) - i) {
                                                     space[z][y][x].faceIn[i] = true;
 
 
-                                                } else { //else it goes to its mirror or passes into face 0 of Z+
-                                                    //again, I can probably leave the previous if out. I was being cautious.
+                                                } else {
 
                                                     if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
                                                         space[z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
@@ -1206,39 +1094,39 @@ public class Test implements Runnable {
                                                         reboundSpace(i, z, y, x);
                                                     }
                                                 }
-                                            } else if (i == (BASE2 - 1) - i) { //if center of top face. 12
+                                            } else if (i == (BASE2 - 1) - i) {
                                                 space[z][y][x].faceIn[i] = true;
-                                                
-                                            } else { //else somewhere on top face. Not front, not left.
+                                                if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                } else {
+                                                    reboundSpace(i, z, y, x);
+                                                }
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if (i % BASE == 0) { //else not top, not front, is on left.
-                                            if (i == (BASE3 - BASE) - i) { //if center of left face. 60
+                                        } else if (i % BASE == 0) {
+                                            if (i == (BASE3 - BASE) - i) {
                                                 space[z][y][x].faceIn[i] = true;
 
-                                            } else { //else somewhere else on left face.
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else { 
-                                            /*
-                                            All reflections off of the corner have been handled.
-                                            All other spaces get passed normally from the open sides.
-                                            */
+                                        } else {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
                                                 space[z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                             } else {
                                                 reboundSpace(i, z, y, x);
                                             }
                                         }
-                                    } else if (x == MAXX - 1) { //else if space is in top front right corner.
+                                    } else if (x == MAXX - 1) {
                                         //code here for z0,y0,x∞
                                         //mody
                                         if (i < BASE2) { //y-
@@ -1267,10 +1155,14 @@ public class Test implements Runnable {
                                             modz = 0;
                                         }
 
-                                        if (i % BASE2 < BASE) { //if i is on front face
-                                            if (i < BASE2) { //if i is on top
-                                                if ((i + 1) % BASE == 0) { //if i is on right
-                                                    space[z][y][x].faceIn[i] = true;
+                                        if (i % BASE2 < BASE) {
+                                            if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    if (space[z + modz][y + mody][x + modx].faceOut[i] == false) {
+                                                        space[z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                    } else {
+                                                        reboundSpace(i, z, y, x);
+                                                    }
                                                 } else {
                                                     if (space[z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
                                                         space[z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
@@ -1278,56 +1170,47 @@ public class Test implements Runnable {
                                                         reboundSpace(i, z, y, x);
                                                     }
                                                 }
-                                            } else if ((i + 1) % BASE == 0) { //front right, not top
-                                                /*
-                                                bounce off of front right edge. 108-i
-                                                104 goes down into 4, 
-                                                29 goes into its mirror at 79, 
-                                                and 54 goes into itself.
-                                                */
+                                            } else if ((i + 1) % BASE == 0) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
-                                            } else { //somewhere else on front face
-                                                //bounce into 104-i
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if (i < BASE2) { //not front, is on top
-                                            if ((i + 1) % BASE == 0) { // top right edge
-                                                //bounce into 28-i
+                                        } else if (i < BASE2) {
+                                            if ((i + 1) % BASE == 0) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
-                                            } else { //elsewhere on top side, bounce into 24-i
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if ((i + 1) % BASE == 0) { //not front or top, is on right
-                                            //bounce into 128-i
+                                        } else if ((i + 1) % BASE == 0) {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
                                                 space[z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
                                             } else {
                                                 reboundSpace(i, z, y, x);
                                             }
-                                        } else { //else no more bouncing off the walls
+                                        } else {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
                                                 space[z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                             } else {
                                                 reboundSpace(i, z, y, x);
                                             }
                                         }
-                                    } else { //else top front edge space anywhere between the far left and right
+                                    } else {
                                         //code here for z0,y0,x~
                                         //mody
                                         if (i < BASE2) { //y-
@@ -1356,26 +1239,26 @@ public class Test implements Runnable {
                                             modz = 0;
                                         }
 
-                                        if (i % BASE2 < BASE) { //if front
-                                            if (i < BASE2) { //if top
+                                        if (i % BASE2 < BASE) {
+                                            if (i < BASE2) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
-                                            } else { //else somewhere on front 
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if (i < BASE2) { //else if on top but not front
-                                            //bounce off top wall
+                                        } else if (i < BASE2) {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
                                                 space[z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                             } else {
                                                 reboundSpace(i, z, y, x);
+
                                             }
                                         } else {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
@@ -1388,13 +1271,13 @@ public class Test implements Runnable {
                                 }
                             }
                         }
-                    } else if (y == MAXY - 1) { //else if front bottom
+                    } else if (y == MAXY - 1) {
                         for (int x = 0; x < MAXX; x++) {
                             for (int i = 0; i < BASE3; i++) {
                                 if (space[z][y][x].faceOut[i] == true) {
                                     //System.out.println("Now processing space[" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
                                     space[z][y][x].faceOut[i] = false;
-                                    if (x == 0) { //if front bottom left
+                                    if (x == 0) {
                                         //code here for z0,y∞,x0
                                         //mody
                                         if (i < BASE2) { //y-
@@ -1423,54 +1306,55 @@ public class Test implements Runnable {
                                             modz = 0;
                                         }
 
-                                        if (i % BASE2 < BASE) { //front
-                                            if (i % BASE == 0) { //left
-                                                if (i >= BASE3 - BASE2) { //bottom                                                   
-                                                        space[z][y][x].faceIn[i] = true;                                                    
-                                                } else { //front left edge
+                                        if (i % BASE2 < BASE) {
+                                            if (i % BASE == 0) {
+                                                if (i >= BASE3 - BASE2) {
+                                                    if (space[z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                    } else {
+                                                        reboundSpace(i, z, y, x);
+                                                    }
+                                                } else {
                                                     if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
                                                         space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
                                                     } else {
                                                         reboundSpace(i, z, y, x);
                                                     }
                                                 }
-                                            } else if (i > BASE3 - BASE2) { //front bottom
-                                                //204-i
+                                            } else if (i > BASE3 - BASE2) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
-                                            } else { //else just front
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if (i % BASE == 0) { //no front, yes left
-                                            if (i > BASE3 - BASE2) { //left bottom
-                                                //[(BASE3 * 2) - (BASE2 + BASE)
-                                                //220-i
-                                                if (space[z + modz][y + mody][x + modx].faceOut[((BASE3 * 2) - (BASE2 + BASE)) - i] == false) {
-                                                    space[z + modz][y + mody][x + modx].faceIn[((BASE3 * 2) - (BASE2 + BASE)) - i] = true;
+                                        } else if (i % BASE == 0) {
+                                            if (i > BASE3 - BASE2) {
+                                                if (space[z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] == false) {
+                                                    space[z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
-                                            } else { //else left face
+                                            } else {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
                                                 } else {
                                                     reboundSpace(i, z, y, x);
                                                 }
                                             }
-                                        } else if (i > BASE3 - BASE2) { //no front, no left, yes bottom
+                                        } else if (i > BASE3 - BASE2) {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
                                                 space[z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
                                             } else {
                                                 reboundSpace(i, z, y, x);
                                             }
-                                        } else { //any other face
+                                        } else {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
                                                 space[z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                             } else {
@@ -1478,7 +1362,7 @@ public class Test implements Runnable {
                                             }
 
                                         }
-                                    } else if (x == MAXX - 1) {//front bottom right space
+                                    } else if (x == MAXX - 1) {
                                         //code here for z0,y∞,x∞
                                         //mody
                                         if (i < BASE2) { //y-
@@ -1507,16 +1391,22 @@ public class Test implements Runnable {
                                             modz = 0;
                                         }
 
-                                        if (i % BASE2 < BASE) { //front
-                                            if ((i + 1) % BASE == 0) {//right
-                                                if (i > BASE3 - BASE2) {//bottom
-                                                        space[z][y][x].faceIn[i] = true;
-                                                } else { //front right edge
+                                        if (i % BASE2 < BASE) {
+                                            if ((i + 1) % BASE == 0) {
+                                                if (i > BASE3 - BASE2) {
+                                                    if (space[z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                    } else {
+                                                        reboundSpace(i, z, y, x);
+                                                    }
+
+                                                } else {
                                                     if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
                                                         space[z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
                                                     } else {
                                                         reboundSpace(i, z, y, x);
                                                     }
+
                                                 }
                                             } else if (i >= BASE3 - BASE2) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
@@ -2971,133 +2861,5 @@ public class Test implements Runnable {
          }
          }
          */
-    }
-
-    public static void fire2() {
-        int modz = 0;
-        int mody = 0;
-        int modx = 0;
-        boolean deflectz = false;
-        boolean deflecty = false;
-        boolean deflectx = false;
-
-        for (int z = 0; z < MAXZ; z++) {
-            for (int y = 0; y < MAXY; y++) {
-                for (int x = 0; x < MAXX; x++) {
-                    for (int i = 0; i < BASE3; i++) {
-                        if (space[z][y][x].faceOut[i] == true) {
-                            space[z][y][x].faceOut[i] = false;
-                            modz = 0;
-
-                            if (i % BASE == 0) {
-                                if (x == 0) {
-                                    modx = 0;
-                                    deflectx = true;
-                                } else {
-                                    modx = -1;
-                                }
-
-                            } else if ((i + 1) % BASE == 0) {
-                                if (x == MAXX - 1) {
-                                    modx = 0;
-                                    deflectx = true;
-                                } else {
-                                    modx = 1;
-                                }
-                            } else {
-                                modx = 0;
-                            }
-                            if (i < BASE2) {
-                                if (y == 0) {
-                                    mody = 0;
-                                    deflecty = true;
-                                } else {
-                                    mody = -1;
-                                }
-                            } else if (i >= BASE3 - BASE2) {
-                                if (y == MAXY - 1) {
-                                    mody = 0;
-                                    deflecty = true;
-                                } else {
-                                    mody = 1;
-                                }
-                            } else {
-                                mody = 0;
-                            }
-                            for (int j = 0; j < BASE; j++) {
-                                if ((i - j) % BASE2 == 0) {
-                                    if (z == 0) {
-                                        modz = 0;
-                                        deflectz = true;
-                                        break;
-                                    } else {
-                                        modz = -1;
-                                        break;
-                                    }
-                                } else if (((i - j) + BASE) % BASE2 == 0) {
-                                    if (z == MAXZ - 1) {
-                                        modz = 0;
-                                        deflectz = true;
-                                        break;
-                                    } else {
-                                        modz = 1;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            space[z + modz][y + mody][x + modx].faceIn[BASE3 - 1 - i] = true;
-
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static void fire() {
-        int modZ = 0;
-        int modY = 0;
-        int modX = 0;
-
-        for (int z = 0; z < MAXZ; z++) {
-            for (int y = 0; y < MAXY; y++) {
-                for (int x = 0; x < MAXX; x++) {
-                    for (int i = 0; i < BASE3; i++) {
-                        if (space[z][y][x].faceOut[i] == true) {
-                            space[z][y][x].faceOut[i] = false;
-                            if (i % BASE == 0) {
-                                if (i < BASE * BASE) {
-                                    if (i == 0) {
-                                        space[z - 1][y - 1][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                    } else if (i == (BASE * (BASE - 1))) {
-                                        space[z + 1][y - 1][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                    } else {
-                                        space[z][y - 1][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                    }
-                                } else if (i > (Math.pow(BASE, 3) - (BASE * (BASE - 1)))) {
-                                    if (i == (BASE * (BASE * (BASE - 1)))) {
-                                        space[z - 1][y + 1][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                    } else if (i == (BASE * BASE) - BASE) {
-                                        space[z + 1][y + 1][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                    } else {
-                                        space[z][y + 1][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                    }
-                                } else if (i % (BASE * BASE) == 0) {
-                                    space[z - 1][y][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                } else if (i - 20 % BASE * BASE == 0) {
-                                    space[z + 1][y][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                } else {
-                                    space[z][y][x - 1].faceIn[BASE3 - (i + 1)] = true;
-                                }
-                            } else if ((i + 1) % BASE == 0) {
-                                if (i < BASE * BASE) {
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
