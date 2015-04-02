@@ -138,7 +138,7 @@ public class Space {
                         int out = mapsBase3[i];
 
                         if (out >= 0) {
-                            faceOut[] = true;
+                            faceOut[out] = true;
                         }
                     }
                 }
