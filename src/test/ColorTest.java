@@ -24,11 +24,11 @@ public class ColorTest implements Runnable {
     static int BASE = 5;
     static int BASE2 = (int) Math.pow(BASE, 2);
     static int BASE3 = (int) Math.pow(BASE, 3);
-    static int MAXZ = 5;
-    static int MAXY = 13;
-    static int MAXX = 6;
+    static int MAXZ = 15;
+    static int MAXY = 160;
+    static int MAXX = 60;
     static BufferedImage spaceMap = new BufferedImage(1900, 1000, BufferedImage.TYPE_INT_RGB);
-    static BufferedImage finalImage = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
+    static BufferedImage testImage = new BufferedImage(1900, 1000, BufferedImage.TYPE_INT_RGB);
     static BufferedImage[] display = new BufferedImage[MAXZ];
     static Space[][][] space = new Space[MAXZ][MAXY][MAXX];
     static Graphics2D g2d;
@@ -84,12 +84,16 @@ public class ColorTest implements Runnable {
         for (int i = 0; i < workFaces.length; i++) {
             workFaces[i] = 0;
         }
-
-        //for (int y = 0; y < MAXY; y++) {
-        //    space[2][y][2].faceIn[64] = true;
-        //}
-
-       // space[2][8][1].faceIn[112] = true;
+        /*
+        //for(int i = 0; i < BASE3; i += 2){
+            for(int x = 0; x < MAXX; x+=3){
+                for(int y = 0; y < MAXY; y+=3){
+                    for(int i = 0; i < BASE3; i += 2){
+                    space[4][y][x].faceOut[i] = true;
+                }
+            }
+        }
+            */
         counter = new int[4];
         java.util.Arrays.fill(counter, 0);
         //space[MAXZ - 1][4][1].faceIn[19] = true;
@@ -434,10 +438,10 @@ public class ColorTest implements Runnable {
 
     public static void update() {
 
-             if (loopcounter < 20) {
+             if (loopcounter < 1000) {
                  
                  space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
-             } else if(loopcounter > 1000){
+             } else if(loopcounter > 5000){
                  loopcounter = 0;
              }
              loopcounter++;
@@ -483,57 +487,60 @@ public class ColorTest implements Runnable {
             sortAttractProcess();
         }
 
-        drawMap3(20, 40);
+        //drawMap4();
         flipDrawSwitch();
+        
 
-        frame.repaint();
+        //frame.repaint();
         //System.out.println("loopcounter == " + loopcounter);
     }
     
-    public static void drawMap4(int startX, int startY) {
-        g2d.clearRect(0, 0, spaceMap.getWidth(), spaceMap.getHeight());
-        int drawX = startX;
-        int drawY = startY + 12;
-        int q = 0;
+    public static void drawMap4() {
+        //g2d.clearRect(0, 0, spaceMap.getWidth(), spaceMap.getHeight());
+        int[] pixelrgb = new int[3];
 
         for (int y = 0; y < MAXY; y++) {
 
-            for (int i = 0; i < (BASE); i++) {
-                for (int z = MAXZ - 1; z >= 0; z--) {
-                    for (int x = 0; x < MAXX; x++) {
-                        for (int j = (i * BASE2); j < (i * BASE2) + BASE2; j++) {
+           // for (int i = 0; i < (BASE); i++) {
+                for (int x = 0; x < MAXX; x++) {
+                    
+                        for (int f = 0; f < BASE3; f++) {
+                            java.util.Arrays.fill(pixelrgb, 0);
+                            for (int z = MAXZ - 1; z >= 0; z--) {
                             //q = space[z][y][x].faceIn[j] ? 35 : (64 + j);
                             //g2d.setColor(Color.DARK_GRAY);
                             //g2d.drawRect(drawX + ((x * (BASE2 * BASE2)) + ((j % BASE2) * (MAXZ + 1))), drawY, MAXZ + 1, MAXZ + 1);
                             //g2d.setColor(Color.BLUE);
                             //g2d.drawLine(0, (drawY - (MAXZ + 4) * i) - 1, 1500, (drawY - (MAXZ + 4) * i) - 1);
                             //g2d.drawLine(drawX + (x * 90) - 5, 0, drawX + (x * 90) - 5, 800);
-                            q = space[z][y][x].faceIn[j] ? 35 : 32;
+                            
 
-                            if (q == 35) {
-                                g2d.setColor(Color.CYAN);
-                                g2d.drawRect(drawX + ((x * (BASE2 * BASE2)) + ((j % BASE2) * (MAXZ + 1))), drawY, z + 1, z + 1);
+                            if (space[z][y][x].faceIn[f]) {
+                                pixelrgb[2] += z*2;
                             }
-                            //g2d.drawRect(drawX + ((x * 120) + ((j % BASE2) * 12)), drawY, 12, 7);
-                            //q = space[z][y][x].faceOut[j] ? 35 : (64 + j);
-                            q = space[z][y][x].faceOut[j] ? 35 : (32);
-                            if (q == 35) {
-                                g2d.setColor(Color.ORANGE);
-                                g2d.drawRect(drawX + ((x * (BASE2 * BASE2)) + ((j % BASE2) * (MAXZ + 1))), drawY, z + 1, z + 1);
+                            
+                            if (space[z][y][x].faceOut[f]) {
+                                pixelrgb[0] += z*2;
                             }
 
                         }
+                            //spaceMap.setRGB(100+x, 100+y, new java.awt.Color(100,100,100).getRGB());
+                            spaceMap.setRGB(100 +(x * BASE2) + (f % BASE2), 100 +(y * BASE) + (int)(f / BASE2),
+                                  //  new java.awt.Color(100,100,100).getRGB());
+                            new java.awt.Color(pixelrgb[0], pixelrgb[1], pixelrgb[2]).getRGB());
                     }
                     // drawY += 7;
-                }
-                drawY += MAXZ + 4;
+                //}
+               // drawY += MAXZ + 4;
             }
-        }
-        g2d.setColor(Color.CYAN);
-
+        } 
+              
     }
+        
+    
+    
 
-    public static void flipDrawSwitch() {
+public static void flipDrawSwitch() {
         if (drawSwitch == true) {
             drawSwitch = false;
         } else {
@@ -669,7 +676,10 @@ public class ColorTest implements Runnable {
         while (t == loop) {
             try {
                 update();
-                Thread.sleep(150);
+                drawMap4();
+                //Thread.sleep(200);
+                frame.repaint();
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
