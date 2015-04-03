@@ -25,10 +25,10 @@ public class ColorTest implements Runnable {
     static int BASE2 = (int) Math.pow(BASE, 2);
     static int BASE3 = (int) Math.pow(BASE, 3);
     static int MAXZ = 22;
-    static int MAXY = 80;
+    static int MAXY = 60;
     static int MAXX = 30;
-    static BufferedImage spaceMap = new BufferedImage(900, 600, BufferedImage.TYPE_INT_RGB);
-    static BufferedImage testImage = new BufferedImage(900, 600, BufferedImage.TYPE_INT_RGB);
+    static BufferedImage spaceMap = new BufferedImage(1000, 600, BufferedImage.TYPE_INT_RGB);
+    static BufferedImage testImage = new BufferedImage(1000, 600, BufferedImage.TYPE_INT_RGB);
     static BufferedImage[] display = new BufferedImage[MAXZ];
     static Space[][][] space = new Space[MAXZ][MAXY][MAXX];
     static Graphics2D g2d;
@@ -73,7 +73,7 @@ public class ColorTest implements Runnable {
         frame = new MyFrame();
         frame.setTitle("Testing");
         frame.setVisible(true);
-        frame.setSize(900, 600);
+        frame.setSize(1000, 600);
         frame.setDefaultCloseOperation(MyFrame.EXIT_ON_CLOSE);
 
 
@@ -85,16 +85,28 @@ public class ColorTest implements Runnable {
         for (int i = 0; i < workFaces.length; i++) {
             workFaces[i] = 0;
         }
-        /*
-        //for(int i = 0; i < BASE3; i += 2){
-            for(int x = 0; x < MAXX; x+=3){
-                for(int y = 0; y < MAXY; y+=3){
-                    for(int i = 0; i < BASE3; i += 2){
-                    space[4][y][x].faceOut[i] = true;
+        for(int z = 0; z < MAXZ; z++){
+            for(int y = 0; y < MAXY; y++){
+                space[z][y][MAXX-1].faceIn[62] = true;
+            }
+        }
+        
+        for(int y = MAXY / 5; y < (MAXY / 5) * 4; y++){
+            for(int x = MAXX / 10; x < (MAXX / 10) * 6; x += (MAXX / 10) * 2){
+                for(int z = 0; z < MAXZ; z++){
+                    space[z][y][x].faceIn[62] = true;
                 }
             }
         }
-            */
+        for(int y = MAXY / 5; y < (MAXY / 5) * 4; y+= MAXY / 5){
+            for(int x = MAXX / 10; x < (MAXX / 10) * 6; x++){
+                if((x / 10) % 2 == 0){
+                    for(int z = 0; z < MAXZ; z++){
+                    space[z][y][x].faceIn[62] = true;
+                    }
+                }
+            }
+        }
         counter = new int[4];
         java.util.Arrays.fill(counter, 0);
         //space[MAXZ - 1][4][1].faceIn[19] = true;
@@ -440,9 +452,9 @@ public class ColorTest implements Runnable {
     public static void update() {
 
              if (loopcounter < 1000) {
-                 for(int i = 0; i < 5; i++){
+                // for(int i = 0; i < 5; i++){
                  space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
-                 }
+                // }
              } else if(loopcounter > 1500){
                  loopcounter = 0;
              }
@@ -529,17 +541,17 @@ public class ColorTest implements Runnable {
 
                         }
                             //spaceMap.setRGB(100+x, 100+y, new java.awt.Color(100,100,100).getRGB());
-                            rgbarray[((x * BASE2) + (f % BASE2)) * ((y * BASE) + (int)(f / BASE2))] = (pixelrgb[0] << 16) | (pixelrgb[1] << 8) | pixelrgb[2];
-                           // spaceMap.setRGB(100 +(x * BASE2) + (f % BASE2), 100 +(y * BASE) + (int)(f / BASE2),
-                           //       //  new java.awt.Color(100,100,100).getRGB());
-                           // new java.awt.Color(pixelrgb[0], pixelrgb[1], pixelrgb[2]).getRGB());
+                           // rgbarray[((x * BASE2) + (f % BASE2)) * ((y * BASE) + (int)(f / BASE2))] = (pixelrgb[0] << 16) | (pixelrgb[1] << 8) | pixelrgb[2];
+                           spaceMap.setRGB(100 +(x * BASE2) + (f % BASE2), 100 +(y * BASE) + (int)(f / BASE2),
+                                  //  new java.awt.Color(100,100,100).getRGB());
+                            new java.awt.Color(pixelrgb[0], pixelrgb[1], pixelrgb[2]).getRGB());
                     }
                     // drawY += 7;
                 //}
                // drawY += MAXZ + 4;
             }
         } 
-        spaceMap.setRGB(0, 0, spaceMap.getWidth(), spaceMap.getHeight(), rgbarray, 0, spaceMap.getWidth());
+        //spaceMap.setRGB(0, 0, (MAXX ) * BASE2, (MAXY - 1) * BASE, rgbarray, 0, (MAXX - 1) * BASE2);
               
     }
         
