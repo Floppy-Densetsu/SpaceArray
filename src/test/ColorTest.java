@@ -24,11 +24,11 @@ public class ColorTest implements Runnable {
     static int BASE = 5;
     static int BASE2 = (int) Math.pow(BASE, 2);
     static int BASE3 = (int) Math.pow(BASE, 3);
-    static int MAXZ = 15;
-    static int MAXY = 160;
-    static int MAXX = 60;
-    static BufferedImage spaceMap = new BufferedImage(1900, 1000, BufferedImage.TYPE_INT_RGB);
-    static BufferedImage testImage = new BufferedImage(1900, 1000, BufferedImage.TYPE_INT_RGB);
+    static int MAXZ = 22;
+    static int MAXY = 80;
+    static int MAXX = 30;
+    static BufferedImage spaceMap = new BufferedImage(900, 600, BufferedImage.TYPE_INT_RGB);
+    static BufferedImage testImage = new BufferedImage(900, 600, BufferedImage.TYPE_INT_RGB);
     static BufferedImage[] display = new BufferedImage[MAXZ];
     static Space[][][] space = new Space[MAXZ][MAXY][MAXX];
     static Graphics2D g2d;
@@ -50,6 +50,7 @@ public class ColorTest implements Runnable {
     static int[] counter;
     static int blah;
     static private int[] workFaces = new int[BASE3];
+    static int[] rgbarray = new int[spaceMap.getWidth() * spaceMap.getHeight()];
 
     static class MyFrame extends javax.swing.JFrame {
 
@@ -72,7 +73,7 @@ public class ColorTest implements Runnable {
         frame = new MyFrame();
         frame.setTitle("Testing");
         frame.setVisible(true);
-        frame.setSize(1900, 1000);
+        frame.setSize(900, 600);
         frame.setDefaultCloseOperation(MyFrame.EXIT_ON_CLOSE);
 
 
@@ -378,11 +379,11 @@ public class ColorTest implements Runnable {
         space[thisZ][thisY][thisX].faceIn[faceB] = false;
         if(space[thisZ][thisY][thisX].faceOut[faceOutA] == true){
             for(int l = 0; l < BASE3; l++){
-                System.out.println("l == " + l);
+                //System.out.println("l == " + l);
                 if(space[thisZ][thisY][thisX].faceOut[l] == false){
                     space[thisZ][thisY][thisX].faceOut[l] = true;
-                    System.out.println("Space[" + thisZ + "][" + thisY + "][" +
-                            thisX + "].faceOut[" + l + "] == true");
+                 //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                  //          thisX + "].faceOut[" + l + "] == true");
                     break;
                 }
             }
@@ -391,11 +392,11 @@ public class ColorTest implements Runnable {
         }
         if(space[thisZ][thisY][thisX].faceOut[faceOutB] == true){
             for(int k = 0; k < BASE3; k++){
-                System.out.println(" k == " + k);
+               // System.out.println(" k == " + k);
                 if(space[thisZ][thisY][thisX].faceOut[k] == false){
                     space[thisZ][thisY][thisX].faceOut[k] = true;
-                    System.out.println("Space[" + thisZ + "][" + thisY + "][" +
-                            thisX + "].faceOut[" + k + "] == true");
+                 //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                  //          thisX + "].faceOut[" + k + "] == true");
                     break;
                 } 
             }
@@ -439,9 +440,10 @@ public class ColorTest implements Runnable {
     public static void update() {
 
              if (loopcounter < 1000) {
-                 
+                 for(int i = 0; i < 5; i++){
                  space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
-             } else if(loopcounter > 5000){
+                 }
+             } else if(loopcounter > 1500){
                  loopcounter = 0;
              }
              loopcounter++;
@@ -498,6 +500,8 @@ public class ColorTest implements Runnable {
     public static void drawMap4() {
         //g2d.clearRect(0, 0, spaceMap.getWidth(), spaceMap.getHeight());
         int[] pixelrgb = new int[3];
+        java.util.Arrays.fill(rgbarray, 0);
+        
 
         for (int y = 0; y < MAXY; y++) {
 
@@ -516,24 +520,26 @@ public class ColorTest implements Runnable {
                             
 
                             if (space[z][y][x].faceIn[f]) {
-                                pixelrgb[2] += z*2;
+                                pixelrgb[1] += z;
                             }
                             
                             if (space[z][y][x].faceOut[f]) {
-                                pixelrgb[0] += z*2;
+                                pixelrgb[0] += z;
                             }
 
                         }
                             //spaceMap.setRGB(100+x, 100+y, new java.awt.Color(100,100,100).getRGB());
-                            spaceMap.setRGB(100 +(x * BASE2) + (f % BASE2), 100 +(y * BASE) + (int)(f / BASE2),
-                                  //  new java.awt.Color(100,100,100).getRGB());
-                            new java.awt.Color(pixelrgb[0], pixelrgb[1], pixelrgb[2]).getRGB());
+                            rgbarray[((x * BASE2) + (f % BASE2)) * ((y * BASE) + (int)(f / BASE2))] = (pixelrgb[0] << 16) | (pixelrgb[1] << 8) | pixelrgb[2];
+                           // spaceMap.setRGB(100 +(x * BASE2) + (f % BASE2), 100 +(y * BASE) + (int)(f / BASE2),
+                           //       //  new java.awt.Color(100,100,100).getRGB());
+                           // new java.awt.Color(pixelrgb[0], pixelrgb[1], pixelrgb[2]).getRGB());
                     }
                     // drawY += 7;
                 //}
                // drawY += MAXZ + 4;
             }
         } 
+        spaceMap.setRGB(0, 0, spaceMap.getWidth(), spaceMap.getHeight(), rgbarray, 0, spaceMap.getWidth());
               
     }
         
@@ -679,7 +685,7 @@ public static void flipDrawSwitch() {
                 drawMap4();
                 //Thread.sleep(200);
                 frame.repaint();
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
