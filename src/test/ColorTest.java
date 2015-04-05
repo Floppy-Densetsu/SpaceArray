@@ -7,14 +7,16 @@ package test;
 /**
  *
  * @author Flopp_000
- * 
- * Gonna try to design this one to show things in a particular way
- * and do some stuff based on user input.
- * 
+ *
+ * Gonna try to design this one to show things in a particular way and do some
+ * stuff based on user input.
+ *
  * It doesn't do anything different right now.
  */
 import java.awt.image.*;
 import java.awt.*;
+import javax.imageio.*;
+import java.awt.image.*;
 
 public class ColorTest implements Runnable {
 
@@ -24,11 +26,11 @@ public class ColorTest implements Runnable {
     static int BASE = 5;
     static int BASE2 = (int) Math.pow(BASE, 2);
     static int BASE3 = (int) Math.pow(BASE, 3);
-    static int MAXZ = 22;
-    static int MAXY = 60;
+    static int MAXZ = 44;
+    static int MAXY = 120;
     static int MAXX = 30;
-    static BufferedImage spaceMap = new BufferedImage(1000, 600, BufferedImage.TYPE_INT_RGB);
-    static BufferedImage testImage = new BufferedImage(1000, 600, BufferedImage.TYPE_INT_RGB);
+    static BufferedImage spaceMap = new BufferedImage(1000, 900, BufferedImage.TYPE_INT_RGB);
+    static BufferedImage testImage = new BufferedImage(1000, 900, BufferedImage.TYPE_INT_RGB);
     static BufferedImage[] display = new BufferedImage[MAXZ];
     static Space[][][] space = new Space[MAXZ][MAXY][MAXX];
     static Graphics2D g2d;
@@ -51,62 +53,75 @@ public class ColorTest implements Runnable {
     static int blah;
     static private int[] workFaces = new int[BASE3];
     static int[] rgbarray = new int[spaceMap.getWidth() * spaceMap.getHeight()];
+    static BufferedImage pic = null;
+    //java.lang.URL imageURL = this.getClass().getClassLoader().getResource("path/to/your/image.jpg");
 
     static class MyFrame extends javax.swing.JFrame {
 
         public void paint(Graphics g) {
 
-            g.drawImage(spaceMap, 0, 0, rootPane);
+            g.drawImage(spaceMap, 5, 35, rootPane);
         }
     }
 
     public static void main(String[] args) {
-
-        for(int i = 0; i < 6; i++){
-            System.out.println((int)(i / 2)*2 + " " + i);
-        }
-
-        newColor = new Color(0);
+        //URL imageURL = this.getClass().getClassLoader().getResource("frog.jpg");
 
         g2d = spaceMap.createGraphics();
         g2d.setFont(font);
         frame = new MyFrame();
         frame.setTitle("Testing");
         frame.setVisible(true);
-        frame.setSize(1000, 600);
+        frame.setSize(1000, 900);
         frame.setDefaultCloseOperation(MyFrame.EXIT_ON_CLOSE);
-
 
         initialize();
         //makeBoxes(MAXZ, MAXY, MAXX, BASE3);
-        
-        
 
         for (int i = 0; i < workFaces.length; i++) {
             workFaces[i] = 0;
         }
-        for(int z = 0; z < MAXZ; z++){
-            for(int y = 0; y < MAXY; y++){
-                space[z][y][MAXX-1].faceIn[62] = true;
-            }
-        }
-        
-        for(int y = MAXY / 5; y < (MAXY / 5) * 4; y++){
-            for(int x = MAXX / 10; x < (MAXX / 10) * 6; x += (MAXX / 10) * 2){
-                for(int z = 0; z < MAXZ; z++){
-                    space[z][y][x].faceIn[62] = true;
-                }
-            }
-        }
-        for(int y = MAXY / 5; y < (MAXY / 5) * 4; y+= MAXY / 5){
-            for(int x = MAXX / 10; x < (MAXX / 10) * 6; x++){
-                if((x / 10) % 2 == 0){
+        /*
+        for(int y = 0; y < 10; y+=2){
+           // for(int x = 0; x < 10; x+=2){
+                for(int f = 0; f < BASE3; f++){
                     for(int z = 0; z < MAXZ; z++){
-                    space[z][y][x].faceIn[62] = true;
+                        if(f != 62){
+                        //space[z][(MAXY / 2) + y][(MAXX / 2) + x].faceIn[f] = true;
+                        space[z][(MAXY / 2) + y][(MAXX / 2)].faceOut[f] = true;
+                        }
                     }
                 }
-            }
+          //  }
         }
+        */
+        loadImage();
+        translateImage(pic);
+        
+        /*
+         for (int z = 0; z < MAXZ; z++) {
+         for (int y = 0; y < MAXY; y++) {
+         space[z][y][MAXX - 1].faceIn[62] = true;
+         }
+         }
+
+         for (int y = MAXY / 5; y < (MAXY / 5) * 4; y++) {
+         for (int x = MAXX / 10; x < (MAXX / 10) * 6; x += (MAXX / 10) * 2) {
+         for (int z = 0; z < MAXZ; z++) {
+         space[z][y][x].faceIn[62] = true;
+         }
+         }
+         }
+         for (int y = MAXY / 5; y < (MAXY / 5) * 4; y += MAXY / 5) {
+         for (int x = MAXX / 10; x < (MAXX / 10) * 6; x++) {
+         if ((x / 10) % 2 == 0) {
+         for (int z = 0; z < MAXZ; z++) {
+         space[z][y][x].faceIn[62] = true;
+         }
+         }
+         }
+         }
+         */
         counter = new int[4];
         java.util.Arrays.fill(counter, 0);
         //space[MAXZ - 1][4][1].faceIn[19] = true;
@@ -115,9 +130,73 @@ public class ColorTest implements Runnable {
         loop.start();
 
     }
+    public static void loadImage(){
+        try{
+            pic = ImageIO.read(new java.io.File("src/resources/untitled.bmp"));
+            //g2d.drawImage(frog, 0, 0, frame);
+        } catch(java.io.IOException e){
+            System.out.println("ProblemS!");
+        }
+    }
+
+    public static void translateImage(java.awt.image.BufferedImage img) {
+        int[] argb = new int[4];
+        for (int y = 0; y < (int)(img.getHeight() / BASE) + (img.getHeight() % BASE); y++) {
+            if (y < img.getWidth() / BASE) {
+                for (int x = 0; x < (int) (img.getWidth() / BASE2) + (img.getWidth() % BASE2); x++) {
+                    if (x < (img.getWidth() / BASE2)) {
+                        for (int f = 0; f < BASE3; f++) {
+                           // argb[0] = (img.getRGB((x * BASE2) + (f % BASE2), (y * BASE) + (int) (f / BASE2)) >> 24) & 0xFF;
+                            argb[1] = (img.getRGB((x * BASE2) + (f % BASE2), (y * BASE) + (int) (f / BASE2)) >> 16) & 0xFF;
+                            argb[2] = (img.getRGB((x * BASE2) + (f % BASE2), (y * BASE) + (int) (f / BASE2)) >> 8) & 0xFF;
+                            argb[3] = img.getRGB((x * BASE2) + (f % BASE2), (y * BASE) + (int) (f / BASE2)) & 0xFF;
+                            for (int i = 0; i < argb.length; i++) {
+                                if (argb[i] > 253) {
+                                    argb[i] = 253;
+                                }
+                            }
+                            for (int i = (MAXZ / 2) - 1; i >= 0; i--) {
+                                if (argb[0] >= i) {
+                                    space[i][y][x].faceIn[f] = true;
+                                    argb[0] -= i;
+                                } else if (argb[0] > 0) {
+                                    space[argb[0]][y][x].faceIn[f] = true;
+                                    argb[0] = 0;
+                                }
+
+                                if (argb[1] >= i) {
+                                    space[i + (MAXZ / 2)][y][x].faceOut[f] = true;
+                                    argb[1] -= i;
+                                } else if (argb[1] > 0) {
+                                    space[argb[1]][y][x].faceOut[f] = true;
+                                    argb[1] = 0;
+                                }
+
+                                if (argb[2] >= i) {
+                                    space[i][y][x].faceOut[f] = true;
+                                    argb[2] -= i;
+                                } else if (argb[2] > 0) {
+                                    space[argb[2]][y][x].faceOut[f] = true;
+                                    argb[2] = 0;
+                                }
+
+                                if (argb[3] >= i) {
+                                    space[i + (MAXZ / 2)][y][x].faceIn[f] = true;
+                                    argb[3] -= i;
+                                } else if (argb[3] > 0) {
+                                    space[argb[3]][y][x].faceIn[f] = true;
+                                    argb[3] = 0;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public static void counterloop() {
-
 
         if (counter[0] < MAXZ) {
             if (counter[1] < MAXY) {
@@ -185,49 +264,45 @@ public class ColorTest implements Runnable {
          * */
         int activeFaces = 0;
         int rand = 0;
-        for(int i = 0; i < workFaces.length; i++){
+        for (int i = 0; i < workFaces.length; i++) {
             workFaces[i] = 0;
         }
 
         for (int z = 0; z < MAXZ; z++) {
             for (int y = 0; y < MAXY; y++) {
                 for (int x = 0; x < MAXX; x++) {
-                     activeFaces = 0;
-         rand = 0;
-        for(int i = 0; i < workFaces.length; i++){
-            workFaces[i] = 0;
-        }
-        
+                    activeFaces = 0;
+                    rand = 0;
+                    for (int i = 0; i < workFaces.length; i++) {
+                        workFaces[i] = 0;
+                    }
+
                     for (int f = 0; f < BASE3; f++) {
 
                         if (space[z][y][x].faceIn[f] == true) {
-                            
+
                             workFaces[activeFaces] = f;
-                            
+
                             //System.out.println("WorkFaces[" + activeFaces + 
                             //        "] filled with: " + f + ".");
-                            
                             activeFaces++;
                         }
                     }
 
-
-                    for (int f = 0; f < (int)((activeFaces + 1) / 2); f++) {
+                    for (int f = 0; f < (int) ((activeFaces + 1) / 2); f++) {
                         if (activeFaces - (f * 2) == 1) {
 
                             passThrough(workFaces[f], z, y, x);
                         } else {
-                            rand = ((int) (Math.random() * (activeFaces - 2 - (f*2) + f))) + 1 ;
+                            rand = ((int) (Math.random() * (activeFaces - 2 - (f * 2) + f))) + 1;
                             passBy(workFaces[f], workFaces[rand], z, y, x);
-                            
+
                             //System.out.println("ActiveFaces: " + activeFaces + 
                             //        ", rand: " + rand + ", f: " + f + ".");
-                                    
-                            
                             workFaces[f] = 0;
                             workFaces[rand] = 0;
-                            
-                            for (int temp = rand; temp < workFaces.length; temp++) {
+
+                            for (int temp = rand; temp < workFaces.length-2; temp++) {
                                 if (workFaces[temp + 1] == 0) {
                                     if (workFaces[temp + 2] == 0) {
                                         break;
@@ -242,7 +317,7 @@ public class ColorTest implements Runnable {
                         }
                     }
 
-                    for (int i = 0; i < activeFaces + 1; i++) {
+                    for (int i = 0; i < activeFaces ; i++) {
                         workFaces[i] = 0;
                     }
                     activeFaces = 0;
@@ -255,10 +330,9 @@ public class ColorTest implements Runnable {
     public static void passThrough(int faceIn, int thisZ, int thisY, int thisX) {
         space[thisZ][thisY][thisX].faceIn[faceIn] = false;
         space[thisZ][thisY][thisX].faceOut[(BASE3 - 1) - faceIn] = true;
-        
+
         //System.out.println("Pass Space[" + thisZ + "][" + thisY + "][" + thisX +
         //        "]: In: " + faceIn + ", To Out: " + ((BASE3 - 1) - faceIn) + ".");
-                
     }
 
     public static boolean[] checkPull(int testFace) {
@@ -311,11 +385,11 @@ public class ColorTest implements Runnable {
         aList = checkPull(faceA);
         bList = checkPull(faceB);
         /*
-        for(int n = 0; n < aList.length; n++){
-            System.out.println("aList[" + n + "] == " + aList[n]);
-            System.out.println("bList[" + n + "] == " + bList[n]);
-        }
-        */
+         for(int n = 0; n < aList.length; n++){
+         System.out.println("aList[" + n + "] == " + aList[n]);
+         System.out.println("bList[" + n + "] == " + bList[n]);
+         }
+         */
 
         if (faceOutA >= BASE2) { //if it's not in the top row(the y- face)
             if (bList[2] == true) { //if the force of B came from the top row and draws A up,
@@ -350,9 +424,7 @@ public class ColorTest implements Runnable {
             }
         }
 
-
         //Do it for B
-
         if (faceOutB % BASE2 >= BASE) {//if faceOutB not on front z- face
             if (aList[0] == true) {//if A draws B towards z-
                 faceOutB = (faceOutB - BASE);//faceOutB moves one layer z-
@@ -367,7 +439,7 @@ public class ColorTest implements Runnable {
             if (aList[2] == true) {//if A draws B towards y-
                 faceOutB = (faceOutB - BASE2);//move faceOutB one layer y-
             }
-        } 
+        }
         if (faceOutB < (BASE3 - BASE2)) {//if faceOutB not on bottom y+ face
             if (aList[3] == true) {//if A draws B towards y+
                 faceOutB = (faceOutB + BASE2);//move faceOutB one layer y+
@@ -379,56 +451,56 @@ public class ColorTest implements Runnable {
                 faceOutB = faceOutB - 1;//move faceOutB one layer x-
             }
         }
-        
+
         if ((faceOutB + 1) % BASE != 0) {//if faceOutB not on right x+ face
             if (aList[5] == true) {//if A draws B towards x+
                 faceOutB = faceOutB + 1;//move faceOutB one layer x+
             }
         }
 
-
         space[thisZ][thisY][thisX].faceIn[faceA] = false;
         space[thisZ][thisY][thisX].faceIn[faceB] = false;
-        if(space[thisZ][thisY][thisX].faceOut[faceOutA] == true){
-            for(int l = 0; l < BASE3; l++){
+        if (space[thisZ][thisY][thisX].faceOut[faceOutA] == true) {
+            for (int l = 0; l < BASE3; l++) {
                 //System.out.println("l == " + l);
-                if(space[thisZ][thisY][thisX].faceOut[l] == false){
+                if (space[thisZ][thisY][thisX].faceOut[l] == false) {
                     space[thisZ][thisY][thisX].faceOut[l] = true;
-                 //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
-                  //          thisX + "].faceOut[" + l + "] == true");
+                    //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                    //          thisX + "].faceOut[" + l + "] == true");
                     break;
                 }
             }
         } else {
-        space[thisZ][thisY][thisX].faceOut[faceOutA] = true;
+            space[thisZ][thisY][thisX].faceOut[faceOutA] = true;
         }
-        if(space[thisZ][thisY][thisX].faceOut[faceOutB] == true){
-            for(int k = 0; k < BASE3; k++){
-               // System.out.println(" k == " + k);
-                if(space[thisZ][thisY][thisX].faceOut[k] == false){
+        if (space[thisZ][thisY][thisX].faceOut[faceOutB] == true) {
+            for (int k = 0; k < BASE3; k++) {
+                // System.out.println(" k == " + k);
+                if (space[thisZ][thisY][thisX].faceOut[k] == false) {
                     space[thisZ][thisY][thisX].faceOut[k] = true;
-                 //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
-                  //          thisX + "].faceOut[" + k + "] == true");
+                    //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                    //          thisX + "].faceOut[" + k + "] == true");
                     break;
-                } 
+                }
             }
         } else {
-        space[thisZ][thisY][thisX].faceOut[faceOutB] = true;
+            space[thisZ][thisY][thisX].faceOut[faceOutB] = true;
         }/*
-        System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX + 
-                "]: In: " + faceA + ", To Out: " + faceOutA + ", Instead Of: " +
-                ((BASE3 - 1) - faceA) + ".");
-        System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX +
-                "] FaceA List: " + aList[0] + aList[1] + aList[2] + aList[3] +
-                aList[4] + aList[5]);
+         System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX + 
+         "]: In: " + faceA + ", To Out: " + faceOutA + ", Instead Of: " +
+         ((BASE3 - 1) - faceA) + ".");
+         System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX +
+         "] FaceA List: " + aList[0] + aList[1] + aList[2] + aList[3] +
+         aList[4] + aList[5]);
 
-        System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX + 
-                "]: In: " + faceB + ", To Out: " + faceOutB + ", Instead Of: " +
-                ((BASE3 - 1) - faceB) + ".");
-        System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX +
-                "] FaceB List: " + bList[0] + bList[1] + bList[2] + bList[3] +
-                bList[4] + bList[5]);
-                */
+         System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX + 
+         "]: In: " + faceB + ", To Out: " + faceOutB + ", Instead Of: " +
+         ((BASE3 - 1) - faceB) + ".");
+         System.out.println("Space[" + thisZ + "][" + thisY + "][" + thisX +
+         "] FaceB List: " + bList[0] + bList[1] + bList[2] + bList[3] +
+         bList[4] + bList[5]);
+         */
+
     }
 
     public void attractProcess(int z, int y, int x) {
@@ -450,115 +522,124 @@ public class ColorTest implements Runnable {
     }
 
     public static void update() {
+        /*
+         if (loopcounter < 1000) {
+         // for(int i = 0; i < 5; i++){
+         space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
+         // }
+         } else if (loopcounter > 1500) {
+         loopcounter = 0;
+         }
+        */
+         loopcounter++;
+         
+        /*
+         for(int t = 0; t < BASE2; t++){
+         space[2][4][0].faceOut[t] = true;
+                     
+         space[2][4][0].faceOut[(t * BASE) + 4] = true;
+                     
+         space[2][4][0].faceOut[((BASE3 - 1) - t)] = true;
+         }
+         */
+        //               space[3][3][3].faceOut[(int)(Math.floor(Math.random() * BASE3))] = true;
+        //               loopcounter++;
+        //           }
 
-             if (loopcounter < 1000) {
-                // for(int i = 0; i < 5; i++){
-                 space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
-                // }
-             } else if(loopcounter > 1500){
-                 loopcounter = 0;
-             }
-             loopcounter++;
-             /*
-                 for(int t = 0; t < BASE2; t++){
-                     space[2][4][0].faceOut[t] = true;
-                     
-                     space[2][4][0].faceOut[(t * BASE) + 4] = true;
-                     
-                     space[2][4][0].faceOut[((BASE3 - 1) - t)] = true;
-                 }
-                 */
-  //               space[3][3][3].faceOut[(int)(Math.floor(Math.random() * BASE3))] = true;
-  //               loopcounter++;
-  //           }
-    
-             /*
-             if(loopcounter >= 40){
-                 if(loopcounter % 10 == 0){
-                 space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
+        /*
+         if(loopcounter >= 40){
+         if(loopcounter % 10 == 0){
+         space[(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
                  
-                 //System.out.println("" + loopcounter);
-                 loopcounter++;
-                 } else {
-                     loopcounter++;
-                 }
+         //System.out.println("" + loopcounter);
+         loopcounter++;
+         } else {
+         loopcounter++;
+         }
                 
-             }
+         }
               
-             if(loopcounter > 200000){
-                 loopcounter = 50;
+         if(loopcounter > 200000){
+         loopcounter = 50;
                  
-             }
-*/
+         }
+         */
+        if(loopcounter > 20){
         if (drawSwitch == true) {
             //space[0][0][0].faceOut[(int)(Math.random() * BASE3)] = true;
             //space[(int)Math.random() * MAXZ][(int)Math.random() * MAXY][(int)Math.random() * MAXX].faceOut[(int)Math.random() * BASE2] = true;
-            fire3();
-            //fire3();
+              fire3();
+
         } else {
             // space[0][0][0].faceIn[(int)(Math.random() * BASE3)] = true;
             //space[(int)Math.floor(Math.random() * MAXZ)][(int)Math.floor(Math.random() * MAXY)][(int)Math.floor(Math.random() * MAXX)].faceIn[(int)Math.floor(Math.random() * BASE2)] = true;
-            sortAttractProcess();
+              sortAttractProcess();
+        }
         }
 
         //drawMap4();
         flipDrawSwitch();
-        
 
         //frame.repaint();
         //System.out.println("loopcounter == " + loopcounter);
     }
-    
+
     public static void drawMap4() {
         //g2d.clearRect(0, 0, spaceMap.getWidth(), spaceMap.getHeight());
-        int[] pixelrgb = new int[3];
+        int[] pixelrgba = new int[4];
         java.util.Arrays.fill(rgbarray, 0);
-        
 
         for (int y = 0; y < MAXY; y++) {
 
-           // for (int i = 0; i < (BASE); i++) {
-                for (int x = 0; x < MAXX; x++) {
-                    
-                        for (int f = 0; f < BASE3; f++) {
-                            java.util.Arrays.fill(pixelrgb, 0);
-                            for (int z = MAXZ - 1; z >= 0; z--) {
-                            //q = space[z][y][x].faceIn[j] ? 35 : (64 + j);
-                            //g2d.setColor(Color.DARK_GRAY);
-                            //g2d.drawRect(drawX + ((x * (BASE2 * BASE2)) + ((j % BASE2) * (MAXZ + 1))), drawY, MAXZ + 1, MAXZ + 1);
-                            //g2d.setColor(Color.BLUE);
-                            //g2d.drawLine(0, (drawY - (MAXZ + 4) * i) - 1, 1500, (drawY - (MAXZ + 4) * i) - 1);
-                            //g2d.drawLine(drawX + (x * 90) - 5, 0, drawX + (x * 90) - 5, 800);
-                            
+            // for (int i = 0; i < (BASE); i++) {
+            for (int x = 0; x < MAXX; x++) {
 
-                            if (space[z][y][x].faceIn[f]) {
-                                pixelrgb[1] += z;
-                            }
-                            
-                            if (space[z][y][x].faceOut[f]) {
-                                pixelrgb[0] += z;
-                            }
+                for (int f = 0; f < BASE3; f++) {
+                    java.util.Arrays.fill(pixelrgba, 0);
+                    for (int z = MAXZ - 1; z >= 0; z--) {
+                        //q = space[z][y][x].faceIn[j] ? 35 : (64 + j);
+                        //g2d.setColor(Color.DARK_GRAY);
+                        //g2d.drawRect(drawX + ((x * (BASE2 * BASE2)) + ((j % BASE2) * (MAXZ + 1))), drawY, MAXZ + 1, MAXZ + 1);
+                        //g2d.setColor(Color.BLUE);
+                        //g2d.drawLine(0, (drawY - (MAXZ + 4) * i) - 1, 1500, (drawY - (MAXZ + 4) * i) - 1);
+                        //g2d.drawLine(drawX + (x * 90) - 5, 0, drawX + (x * 90) - 5, 800);
 
+                        if (space[z][y][x].faceIn[f]) {
+
+                            if (z >= 22) {
+                                pixelrgba[2] += (z - 21);
+                            } else {
+                                pixelrgba[3] += z + 1;
+                            }
                         }
-                            //spaceMap.setRGB(100+x, 100+y, new java.awt.Color(100,100,100).getRGB());
-                           // rgbarray[((x * BASE2) + (f % BASE2)) * ((y * BASE) + (int)(f / BASE2))] = (pixelrgb[0] << 16) | (pixelrgb[1] << 8) | pixelrgb[2];
-                           spaceMap.setRGB(100 +(x * BASE2) + (f % BASE2), 100 +(y * BASE) + (int)(f / BASE2),
-                                  //  new java.awt.Color(100,100,100).getRGB());
-                            new java.awt.Color(pixelrgb[0], pixelrgb[1], pixelrgb[2]).getRGB());
-                    }
-                    // drawY += 7;
-                //}
-               // drawY += MAXZ + 4;
-            }
-        } 
-        //spaceMap.setRGB(0, 0, (MAXX ) * BASE2, (MAXY - 1) * BASE, rgbarray, 0, (MAXX - 1) * BASE2);
-              
-    }
-        
-    
-    
 
-public static void flipDrawSwitch() {
+                        if (space[z][y][x].faceOut[f]) {
+                            if (z >= 22) {
+                                pixelrgba[0] += (z - 21);
+                            } else {
+                                pixelrgba[1] += z + 1;
+                            }
+                        }
+
+                    }
+                    //spaceMap.setRGB(100+x, 100+y, new java.awt.Color(100,100,100).getRGB());
+                    // rgbarray[((x * BASE2) + (f % BASE2)) * ((y * BASE) + (int)(f / BASE2))] = (pixelrgb[0] << 16) | (pixelrgb[1] << 8) | pixelrgb[2];
+                    spaceMap.setRGB(10 + (x * BASE2) + (f % BASE2), 10 + (y * BASE) + (int) (f / BASE2),
+                            //  new java.awt.Color(100,100,100).getRGB());
+
+                            new java.awt.Color(pixelrgba[0], pixelrgba[1], pixelrgba[2], pixelrgba[3]).getRGB());
+
+                }
+                // drawY += 7;
+                //}
+                // drawY += MAXZ + 4;
+            }
+        }
+        //spaceMap.setRGB(0, 0, (MAXX ) * BASE2, (MAXY - 1) * BASE, rgbarray, 0, (MAXX - 1) * BASE2);
+
+    }
+
+    public static void flipDrawSwitch() {
         if (drawSwitch == true) {
             drawSwitch = false;
         } else {
@@ -669,7 +750,6 @@ public static void flipDrawSwitch() {
                              g2d.drawRect(drawX + ((x * (BASE2 * BASE2)) + ((j % BASE2) * (MAXZ + 1))), drawY, z + 1, z + 1);
                              }
                              */
-
 
                         }
                         // drawY += 7;
@@ -843,180 +923,178 @@ public static void flipDrawSwitch() {
             }
         }
     }
-/*
-    public static void fire5() {
-        int modz = 0;
-        int mody = 0;
-        int modx = 0;
-        int boff = (BASE - (BASE % 2)) / 2; //Base Offset - The number of layers from the center to the outside. In the case of BASE 5, the offset would be 2. BASE 7 would have 3.
+    /*
+     public static void fire5() {
+     int modz = 0;
+     int mody = 0;
+     int modx = 0;
+     int boff = (BASE - (BASE % 2)) / 2; //Base Offset - The number of layers from the center to the outside. In the case of BASE 5, the offset would be 2. BASE 7 would have 3.
 
 
-        for (int z = 0; z < MAXZ; z++) {
-            if (z == 0) {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z0,y0,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                    if (f <) {
-                                    }
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z0,y0,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z0,y0,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z0,y!,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z0,y!,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z0,y!,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z0,y~,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z0,y~,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z0,y~,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (z == MAXZ - 1) {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z!,y0,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z!,y0,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z!,y0,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z!,y!,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z!,y!,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z!,y!,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z!,y~,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z!,y~,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z!,y~,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z~,y0,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z~,y0,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z~,y0,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z~,y!,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z~,y!,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z~,y!,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            if (x == 0) {
-                                //z~,y~,x0
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else if (x == MAXX - 1) {
-                                //z~,y~,x!
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            } else {
-                                //z~,y~,x~
-                                for (int f = 0; f < BASE3; f++) {
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-*/
-    
-    
-    
+     for (int z = 0; z < MAXZ; z++) {
+     if (z == 0) {
+     for (int y = 0; y < MAXY; y++) {
+     if (y == 0) {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z0,y0,x0
+     for (int f = 0; f < BASE3; f++) {
+     if (f <) {
+     }
+     }
+     } else if (x == MAXX - 1) {
+     //z0,y0,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z0,y0,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     } else if (y == MAXY - 1) {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z0,y!,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z0,y!,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z0,y!,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     } else {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z0,y~,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z0,y~,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z0,y~,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     }
+     }
+     } else if (z == MAXZ - 1) {
+     for (int y = 0; y < MAXY; y++) {
+     if (y == 0) {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z!,y0,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z!,y0,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z!,y0,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     } else if (y == MAXY - 1) {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z!,y!,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z!,y!,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z!,y!,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     } else {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z!,y~,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z!,y~,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z!,y~,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     }
+     }
+     } else {
+     for (int y = 0; y < MAXY; y++) {
+     if (y == 0) {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z~,y0,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z~,y0,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z~,y0,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     } else if (y == MAXY - 1) {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z~,y!,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z~,y!,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z~,y!,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     } else {
+     for (int x = 0; x < MAXX; x++) {
+     if (x == 0) {
+     //z~,y~,x0
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else if (x == MAXX - 1) {
+     //z~,y~,x!
+     for (int f = 0; f < BASE3; f++) {
+     }
+     } else {
+     //z~,y~,x~
+     for (int f = 0; f < BASE3; f++) {
+     }
+     }
+     }
+     }
+     }
+     }
+     }
+     }
+     */
+
     public static void fire3() {
         int modz = 0;
         int mody = 0;
@@ -1112,7 +1190,6 @@ public static void flipDrawSwitch() {
                                             if (i % BASE == 0) {
                                                 if (i == (BASE2 - BASE) - i) {
                                                     space[z][y][x].faceIn[i] = true;
-
 
                                                 } else {
 
@@ -2138,7 +2215,6 @@ public static void flipDrawSwitch() {
                                                     reboundSpace(i, z, y, x);
                                                 }
 
-
                                             }
                                         } else if (i >= (BASE3 - BASE2)) {
                                             if ((i + 1) % BASE == 0) {
@@ -2674,7 +2750,6 @@ public static void flipDrawSwitch() {
                                             modz = 0;
                                         }
 
-
                                         if (i >= BASE3 - BASE2) {
                                             if ((i + 1) % BASE == 0) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
@@ -2723,7 +2798,6 @@ public static void flipDrawSwitch() {
                                         } else {
                                             modx = 0;
                                         }
-
 
                                         if (i % BASE2 < BASE) {
                                             modz = -1;
@@ -2784,7 +2858,6 @@ public static void flipDrawSwitch() {
                                         } else {
                                             modz = 0;
                                         }
-
 
                                         if (i % BASE == 0) {
                                             if (space[z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
