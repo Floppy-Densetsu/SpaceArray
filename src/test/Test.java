@@ -1873,7 +1873,7 @@ public class Test implements Runnable {
                                                 }
 
                                             }
-                                        } else if (i < BASE) {
+                                        } else if (i < BASE2) {
                                             if (i % BASE == 0) {
                                                 if (space[z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
                                                     space[z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
