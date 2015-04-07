@@ -81,47 +81,58 @@ public class ColorTest implements Runnable {
         for (int i = 0; i < workFaces.length; i++) {
             workFaces[i] = 0;
         }
-        /*
+        
          for(int y = 0; y < 10; y+=2){
          // for(int x = 0; x < 10; x+=2){
          for(int f = 0; f < BASE3; f++){
-         for(int z = 0; z < MAXZ; z++){
-         if(f != 62){
+         for(int z = 0; z < MAXZ / 2; z++){
+         if(f / BASE2 != 2){
          //space[0][z][(MAXY / 2) + y][(MAXX / 2) + x].faceIn[f] = true;
-         space[0][z][(MAXY / 2) + y][(MAXX / 2)].faceOut[f] = true;
+             
+         space[0][z][(MAXY / 2) + y][(MAXX / 2) - 3].faceOut[f] = true;
+         space[0][z + (MAXZ / 2)][y + 3][(MAXX / 2) + 2].faceOut[f] = true;
          }
          }
          }
-         //  }
-         }
-         */
-        loadImage();
-        translateImage(pic);
+        }
+        
+         
+         
+         
+        //loadImage();
+        //translateImage(pic);
 
+        for (int z = 0; z < MAXZ; z++) {
+            for (int y = MAXY / 5; y < (MAXY / 5) * 2; y++) {
+                space[0][z][y][(MAXX / 10) * 8].faceIn[62] = true;
+                space[1][z][y][(MAXX / 10) * 8].faceIn[62] = true;
+            }
+        }
+
+        for (int y = MAXY / 5; y < (MAXY / 5) * 4; y++) {
+            for (int x = MAXX / 10; x < (MAXX / 10) * 6; x += (MAXX / 10) * 2) {
+                for (int z = 0; z < MAXZ; z++) {
+                    space[0][z][y][x].zyxBlock[0] = true;
+                    space[1][z][y][x].zyxBlock[0] = true;
+                    space[0][z][y][x].zyxBlock[1] = true;
+                    space[1][z][y][x].zyxBlock[1] = true;
+                    
+                    space[0][z][y][x].faceIn[62] = true;
+                    space[1][z][y][x].faceIn[62] = true;
+                }
+            }
+        }
         /*
-         for (int z = 0; z < MAXZ; z++) {
-         for (int y = 0; y < MAXY; y++) {
-         space[0][z][y][MAXX - 1].faceIn[62] = true;
-         }
-         }
-
-         for (int y = MAXY / 5; y < (MAXY / 5) * 4; y++) {
-         for (int x = MAXX / 10; x < (MAXX / 10) * 6; x += (MAXX / 10) * 2) {
-         for (int z = 0; z < MAXZ; z++) {
-         space[0][z][y][x].faceIn[62] = true;
-         }
-         }
-         }
-         for (int y = MAXY / 5; y < (MAXY / 5) * 4; y += MAXY / 5) {
-         for (int x = MAXX / 10; x < (MAXX / 10) * 6; x++) {
-         if ((x / 10) % 2 == 0) {
-         for (int z = 0; z < MAXZ; z++) {
-         space[0][z][y][x].faceIn[62] = true;
-         }
-         }
-         }
-         }
-         */
+        for (int y = MAXY / 5; y < (MAXY / 5) * 4; y += MAXY / 5) {
+            for (int x = MAXX / 10; x < (MAXX / 10) * 6; x++) {
+                if ((x / 10) % 2 == 0) {
+                    for (int z = 0; z < MAXZ; z++) {
+                        space[0][z][y][x].faceIn[62] = true;
+                    }
+                }
+            }
+        }
+        */
         counter = new int[4];
         java.util.Arrays.fill(counter, 0);
         //space[0][MAXZ - 1][4][1].faceIn[19] = true;
@@ -133,7 +144,7 @@ public class ColorTest implements Runnable {
 
     public static void loadImage() {
         try {
-            pic = ImageIO.read(ColorTest.class.getClass().getResource("/frog.jpg"));
+            pic = ImageIO.read(ColorTest.class.getClass().getResource("/untitled.bmp"));
 
         } catch (java.io.IOException e) {
             System.out.println("ProblemS!");
@@ -276,7 +287,30 @@ public class ColorTest implements Runnable {
 
         for (int z = 0; z < MAXZ; z++) {
             for (int y = 0; y < MAXY; y++) {
+
                 for (int x = 0; x < MAXX; x++) {
+                    if (!D) {
+                        if (space[0][z][y][x].faceIn[(BASE3 - 1) / 2]) {
+                            for (int f = 0; f < BASE3; f++) {
+                                if (space[0][z][y][x].faceIn[f]) {
+                                    space[0][z][y][x].faceIn[f] = false;
+                                    space[1][z][y][x].faceOut[Space.mapsBase5[f]] = true;
+                                }
+                            }
+                            continue;
+                        }
+                    } else {
+                        if (space[1][z][y][x].faceIn[(BASE3 - 1) / 2]) {
+                            for (int f = 0; f < BASE3; f++) {
+                                if (space[1][z][y][x].faceIn[f]) {
+                                    space[1][z][y][x].faceIn[f] = false;
+                                    space[0][z][y][x].faceOut[Space.mapsBase5[f]] = true;
+                                }
+                            }
+                            continue;
+                        }
+                    }
+
                     activeFaces = 0;
                     rand = 0;
                     for (int i = 0; i < workFaces.length; i++) {
@@ -289,7 +323,7 @@ public class ColorTest implements Runnable {
 
                                 workFaces[activeFaces] = f;
 
-                            //System.out.println("WorkFaces[" + activeFaces + 
+                                //System.out.println("WorkFaces[" + activeFaces + 
                                 //        "] filled with: " + f + ".");
                                 activeFaces++;
                             }
@@ -298,7 +332,7 @@ public class ColorTest implements Runnable {
 
                                 workFaces[activeFaces] = f;
 
-                            //System.out.println("WorkFaces[" + activeFaces + 
+                                //System.out.println("WorkFaces[" + activeFaces + 
                                 //        "] filled with: " + f + ".");
                                 activeFaces++;
                             }
@@ -494,7 +528,7 @@ public class ColorTest implements Runnable {
                     //System.out.println("l == " + l);
                     if (space[0][thisZ][thisY][thisX].faceOut[l] == false) {
                         space[0][thisZ][thisY][thisX].faceOut[l] = true;
-                    //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                        //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
                         //          thisX + "].faceOut[" + l + "] == true");
                         break;
                     }
@@ -507,7 +541,7 @@ public class ColorTest implements Runnable {
                     // System.out.println(" k == " + k);
                     if (space[0][thisZ][thisY][thisX].faceOut[k] == false) {
                         space[0][thisZ][thisY][thisX].faceOut[k] = true;
-                    //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                        //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
                         //          thisX + "].faceOut[" + k + "] == true");
                         break;
                     }
@@ -521,7 +555,7 @@ public class ColorTest implements Runnable {
                     //System.out.println("l == " + l);
                     if (space[1][thisZ][thisY][thisX].faceOut[l] == false) {
                         space[1][thisZ][thisY][thisX].faceOut[l] = true;
-                    //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                        //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
                         //          thisX + "].faceOut[" + l + "] == true");
                         break;
                     }
@@ -534,7 +568,7 @@ public class ColorTest implements Runnable {
                     // System.out.println(" k == " + k);
                     if (space[1][thisZ][thisY][thisX].faceOut[k] == false) {
                         space[1][thisZ][thisY][thisX].faceOut[k] = true;
-                    //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
+                        //   System.out.println("Space[" + thisZ + "][" + thisY + "][" +
                         //          thisX + "].faceOut[" + k + "] == true");
                         break;
                     }
@@ -579,17 +613,20 @@ public class ColorTest implements Runnable {
     }
 
     public static void update() {
+
         
-                
-        /*
          if (loopcounter < 1000) {
          // for(int i = 0; i < 5; i++){
+             if(!D){
+                 for(int i = 0; i < 50; i++){
          space[0][(int) Math.floor(Math.random() * MAXZ)][(int) Math.floor(Math.random() * MAXY)][(int) Math.floor(Math.random() * MAXX)].faceIn[(int) Math.floor(Math.random() * BASE3)] = true;
          // }
+                 }
+             } 
          } else if (loopcounter > 1500) {
          loopcounter = 0;
          }
-         */
+         
         loopcounter++;
 
         /*
@@ -626,15 +663,15 @@ public class ColorTest implements Runnable {
         if (loopcounter > 20) {
             //if (drawSwitch == true) {
             //space[0][0][0][0].faceOut[(int)(Math.random() * BASE3)] = true;
-                //space[0][(int)Math.random() * MAXZ][(int)Math.random() * MAXY][(int)Math.random() * MAXX].faceOut[(int)Math.random() * BASE2] = true;
-                fire0();
+            //space[0][(int)Math.random() * MAXZ][(int)Math.random() * MAXY][(int)Math.random() * MAXX].faceOut[(int)Math.random() * BASE2] = true;
+            fire0();
 
-           // } else {
+            // } else {
             // space[0][0][0][0].faceIn[(int)(Math.random() * BASE3)] = true;
-                //space[0][(int)Math.floor(Math.random() * MAXZ)][(int)Math.floor(Math.random() * MAXY)][(int)Math.floor(Math.random() * MAXX)].faceIn[(int)Math.floor(Math.random() * BASE2)] = true;
-                //  sortAttractProcess();
-                processSpace();
-           // }
+            //space[0][(int)Math.floor(Math.random() * MAXZ)][(int)Math.floor(Math.random() * MAXY)][(int)Math.floor(Math.random() * MAXX)].faceIn[(int)Math.floor(Math.random() * BASE2)] = true;
+            // sortAttractProcess();
+            processSpace();
+            // }
         }
 
         //drawMap4();
@@ -663,40 +700,40 @@ public class ColorTest implements Runnable {
                         //g2d.setColor(Color.BLUE);
                         //g2d.drawLine(0, (drawY - (MAXZ + 4) * i) - 1, 1500, (drawY - (MAXZ + 4) * i) - 1);
                         //g2d.drawLine(drawX + (x * 90) - 5, 0, drawX + (x * 90) - 5, 800);
-                        if(!D){
-                        if (space[0][z][y][x].faceIn[f]) {
+                        if (!D) {
+                            if (space[0][z][y][x].faceIn[f]) {
 
-                            if (z >= 22) {
-                                pixelrgba[2] += (z - 21);
-                            } else {
-                                pixelrgba[3] += z + 1;
+                                if (z >= 22) {
+                                    pixelrgba[2] += (z - 21);
+                                } else {
+                                    pixelrgba[3] += z + 1;
+                                }
                             }
-                        }
 
-                        if (space[0][z][y][x].faceOut[f]) {
-                            if (z >= 22) {
-                                pixelrgba[0] += (z - 21);
-                            } else {
-                                pixelrgba[1] += z + 1;
+                            if (space[0][z][y][x].faceOut[f]) {
+                                if (z >= 22) {
+                                    pixelrgba[0] += (z - 21);
+                                } else {
+                                    pixelrgba[1] += z + 1;
+                                }
                             }
-                        }
-                        }else {
+                        } else {
                             if (space[1][z][y][x].faceIn[f]) {
 
-                            if (z >= 22) {
-                                pixelrgba[2] += (z - 21);
-                            } else {
-                                pixelrgba[3] += z + 1;
+                                if (z >= 22) {
+                                    pixelrgba[2] += (z - 21);
+                                } else {
+                                    pixelrgba[3] += z + 1;
+                                }
                             }
-                        }
 
-                        if (space[1][z][y][x].faceOut[f]) {
-                            if (z >= 22) {
-                                pixelrgba[0] += (z - 21);
-                            } else {
-                                pixelrgba[1] += z + 1;
+                            if (space[1][z][y][x].faceOut[f]) {
+                                if (z >= 22) {
+                                    pixelrgba[0] += (z - 21);
+                                } else {
+                                    pixelrgba[1] += z + 1;
+                                }
                             }
-                        }
                         }
 
                     }
@@ -726,20 +763,39 @@ public class ColorTest implements Runnable {
     }
 
     public static void processSpace() {
-        if(!D){
-        for (int z = 0; z < MAXZ; z++) {
-            for (int y = 0; y < MAXY; y++) {
-                for (int x = 0; x < MAXX; x++) {
-                  
-                        for(int f = 0; f < BASE3; f++){
-                            if(space[0][z][y][x].faceIn[f]){
-                                space[0][z][y][x].faceIn[f] = false;
-                                space[1][z][y][x].faceOut[(BASE3 - 1) - f] = true;
-                            } 
+        if (!D) {
+            for (int z = 0; z < MAXZ; z++) {
+                for (int y = 0; y < MAXY; y++) {
+                    for (int x = 0; x < MAXX; x++) {
+                        if(space[0][z][y][x].zyxBlock[0] && space[0][z][y][x].zyxBlock[1]){
+                            for(int f = 0; f < BASE3; f++){
+                                if(space[0][z][y][x].faceIn[f]){
+                                    space[0][z][y][x].faceIn[f] = false;
+                                    space[1][z][y][x].faceOut[Space.mapsBase5ZYWall[f]] = true;
+                                }
+                            }
+                        } else
+                        if (space[0][z][y][x].faceIn[(BASE3 - 1) / 2]) {
+                            for (int f = 0; f < BASE3; f++) {
+                                if(f != (BASE3 - 1) / 2){
+                                if (space[0][z][y][x].faceIn[f]) {
+                                    space[0][z][y][x].faceIn[f] = false;
+                                    space[1][z][y][x].faceOut[Space.mapsBase5[f]] = true;
+                                }
+                                }
+                            }
+                        } else {
+                            for (int f = 0; f < BASE3; f++) {
+                                if(f != (BASE3 - 1) / 2){
+                                if (space[0][z][y][x].faceIn[f]) {
+                                    space[0][z][y][x].faceIn[f] = false;
+                                    space[1][z][y][x].faceOut[(BASE3 - 1) - f] = true;
+                                }
+                                }
+                            }
                         }
                    // space[0][z][y][x].passThru();
-                    
-                    
+
                         //space[1][z][y][x].passThru();
                     }
                     /*
@@ -756,33 +812,53 @@ public class ColorTest implements Runnable {
             }
         } else {
             for (int z = 0; z < MAXZ; z++) {
-            for (int y = 0; y < MAXY; y++) {
-                for (int x = 0; x < MAXX; x++) {
-                  
-                        for(int f = 0; f < BASE3; f++){
-                            if(space[1][z][y][x].faceIn[f]){
-                                space[1][z][y][x].faceIn[f] = false;
-                                space[0][z][y][x].faceOut[(BASE3 - 1) - f] = true;
-                            } 
+                for (int y = 0; y < MAXY; y++) {
+                    for (int x = 0; x < MAXX; x++) {
+                        if(space[1][z][y][x].zyxBlock[0] && space[1][z][y][x].zyxBlock[1]){
+                            for(int f = 0; f < BASE3; f++){
+                                if(space[1][z][y][x].faceIn[f]){
+                                    space[1][z][y][x].faceIn[f] = false;
+                                    space[0][z][y][x].faceOut[Space.mapsBase5ZYWall[f]] = true;
+                                }
+                            }
+                        } else 
+                        if (space[1][z][y][x].faceIn[(BASE3 - 1) / 2]) {
+                            for (int f = 0; f < BASE3; f++) {
+                                if(f != (BASE3 - 1) / 2){
+                                if (space[1][z][y][x].faceIn[f]) {
+                                    space[1][z][y][x].faceIn[f] = false;
+                                    space[0][z][y][x].faceOut[Space.mapsBase5[f]] = true;
+                                }
+                                }
+                            }
+                        } else {
+                            for (int f = 0; f < BASE3; f++) {
+                                if(f != (BASE3 - 1) / 2){
+                                if (space[1][z][y][x].faceIn[f]) {
+                                    space[1][z][y][x].faceIn[f] = false;
+                                    space[0][z][y][x].faceOut[(BASE3 - 1) - f] = true;
+                                }
+                                }
+                            }
                         }
+                    }
                 }
+
             }
-            
         }
-    }
     }
 
     public static void clearAll() {
         for (int z = 0; z < MAXZ; z++) {
             for (int y = 0; y < MAXY; y++) {
                 for (int x = 0; x < MAXX; x++) {
-                    if(!D){
-                    java.util.Arrays.fill(space[0][z][y][x].faceIn, false);
-                    java.util.Arrays.fill(space[0][z][y][x].faceOut, false);
+                    if (!D) {
+                        java.util.Arrays.fill(space[0][z][y][x].faceIn, false);
+                        java.util.Arrays.fill(space[0][z][y][x].faceOut, false);
                     } else {
-                        
-                    java.util.Arrays.fill(space[1][z][y][x].faceIn, false);
-                    java.util.Arrays.fill(space[1][z][y][x].faceOut, false);
+
+                        java.util.Arrays.fill(space[1][z][y][x].faceIn, false);
+                        java.util.Arrays.fill(space[1][z][y][x].faceOut, false);
                     }
                 }
             }
@@ -885,11 +961,13 @@ public class ColorTest implements Runnable {
         while (t == loop) {
             try {
                 //update();
+                //if(loopcounter % 10 == 0){
                 drawMap4();
+                //}
                 //Thread.sleep(200);
                 frame.repaint();
                 update();
-                if(!D){
+                if (!D) {
                     D = true;
                 } else {
                     D = false;
@@ -1217,3719 +1295,1855 @@ public class ColorTest implements Runnable {
         int modz = 0;
         int mody = 0;
         int modx = 0;
-        if(!D){
-        for (int z = 0; z < MAXZ; z++) {
-            if (z == 0) {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z0,y0,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= (BASE3 - BASE2)) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+        if (!D) {
+            for (int z = 0; z < MAXZ; z++) {
+                if (z == 0) {
+                    for (int y = 0; y < MAXY; y++) {
+                        if (y == 0) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z0,y0,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= (BASE3 - BASE2)) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        //modx
-                                        if ((i % BASE) == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modx
+                                            if ((i % BASE) == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if (i % BASE2 < BASE) {
-                                            if (i < BASE) {
-                                                if (i % BASE == 0) {
-                                                    //  space[0][z][y][x].faceOut[i] = false;
-                                                    space[1][z][y][x].faceIn[i] = true;
+                                            if (i % BASE2 < BASE) {
+                                                if (i < BASE) {
+                                                    if (i % BASE == 0) {
+                                                        //  space[0][z][y][x].faceOut[i] = false;
+                                                        space[1][z][y][x].faceIn[i] = true;
 
-                                                } else if ((i + 1) % BASE == 0) {
+                                                    } else if ((i + 1) % BASE == 0) {
 
-                                                    // if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
-                                                    //} else {
-                                                    //    reboundSpace(i, z, y, x);
-                                                    //}
-                                                } else if (i == (BASE - 1) - i) {
-                                                    // space[0][z][y][x].faceOut[i] = false;
+                                                        // if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                        //} else {
+                                                        //    reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else if (i == (BASE - 1) - i) {
+                                                        // space[0][z][y][x].faceOut[i] = false;
+                                                        space[1][z][y][x].faceIn[i] = true;
+                                                    } else {
+                                                        // if (space[0][z][y][x].faceOut[(BASE3 - 1) - i] == false) {
+                                                        space[1][z][y][x].faceIn[(BASE3 - 1) - i] = true;
+                                                        // } else {
+                                                        //    reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if (i % BASE == 0) {
+                                                    if (i == (BASE3 - BASE2)) {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                        //} else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else if (i == (BASE3 - BASE2) - i) {
+                                                        space[1][z][y][x].faceIn[i] = true;
+                                                    } else {
+                                                        //if (space[1][z][y][x].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                        space[1][z][y][x].faceIn[(BASE3 - BASE2) - i] = true;
+                                                        //} else {
+                                                        //    reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if (i == (BASE3 - BASE2) + (BASE - 1) - i) {
                                                     space[1][z][y][x].faceIn[i] = true;
                                                 } else {
-                                                    // if (space[0][z][y][x].faceOut[(BASE3 - 1) - i] == false) {
-                                                    space[1][z][y][x].faceIn[(BASE3 - 1) - i] = true;
-                                                    // } else {
-                                                    //    reboundSpace(i, z, y, x);
-                                                    //}
-                                                }
-                                            } else if (i % BASE == 0) {
-                                                if (i == (BASE3 - BASE2)) {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
                                                     //} else {
                                                     //   reboundSpace(i, z, y, x);
                                                     //}
-                                                } else if (i == (BASE3 - BASE2) - i) {
-                                                    space[1][z][y][x].faceIn[i] = true;
-                                                } else {
-                                                    //if (space[1][z][y][x].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                    space[1][z][y][x].faceIn[(BASE3 - BASE2) - i] = true;
+                                                }
+                                            } else if (i < BASE2) {
+                                                if (i % BASE == 0) {
+                                                    if (i == (BASE2 - BASE) - i) {
+                                                        space[1][z][y][x].faceIn[i] = true;
+
+                                                    } else {
+
+                                                        //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                    //} else if (i == (BASE2 - 1) - i) {
+                                                    //  space[1][z][y][x].faceIn[i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    //    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                                     //} else {
-                                                    //    reboundSpace(i, z, y, x);
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //   reboundSpace(i, z, y, x);
                                                     //}
                                                 }
-                                            } else if (i == (BASE3 - BASE2) + (BASE - 1) - i) {
-                                                space[1][z][y][x].faceIn[i] = true;
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i < BASE2) {
-                                            if (i % BASE == 0) {
-                                                if (i == (BASE2 - BASE) - i) {
+                                            } else if (i % BASE == 0) {
+                                                if (i == (BASE3 - BASE) - i) {
                                                     space[1][z][y][x].faceIn[i] = true;
 
                                                 } else {
-
-                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
                                                 }
-                                            //} else if (i == (BASE2 - 1) - i) {
-                                                //  space[1][z][y][x].faceIn[i] = true;
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                //    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            if (i == (BASE3 - BASE) - i) {
-                                                space[1][z][y][x].faceIn[i] = true;
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
                                             }
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z0,y0,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z0,y0,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if (i % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                if ((i + 1) % BASE == 0) {
-                                                    //   if (space[1][z + modz][y + mody][x + modx].faceOut[i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
-                                                   // } else {
-                                                    //   reboundSpace(i, z, y, x);
+                                            if (i % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    if ((i + 1) % BASE == 0) {
+                                                        //   if (space[1][z + modz][y + mody][x + modx].faceOut[i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        // } else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if ((i + 1) % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
                                                     //}
                                                 } else {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
                                                 }
                                             } else if ((i + 1) % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
                                             }
-                                        } else if (i < BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
+                                        } else {
+                                            //code here for z0,y0,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
                                             } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i < BASE2) {
                                                 //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
                                                 space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
                                             //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        }
-                                    } else {
-                                        //code here for z0,y0,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
-                                                //} else {
                                                 //  reboundSpace(i, z, y, x);
+
                                                 //}
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
                                             }
-                                        } else if (i < BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-
-                                            //}
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z0,y∞,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
+                        } else if (y == MAXY - 1) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z0,y∞,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if (i % BASE2 < BASE) {
-                                            if (i % BASE == 0) {
-                                                if (i >= BASE3 - BASE2) {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceIn[i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                            if (i % BASE2 < BASE) {
+                                                if (i % BASE == 0) {
+                                                    if (i >= BASE3 - BASE2) {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if (i > BASE3 - BASE2) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
                                                     //} else {
-                                                    //   reboundSpace(i, z, y, x);
+                                                    //  reboundSpace(i, z, y, x);
                                                     //}
                                                 } else {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                if (i > BASE3 - BASE2) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
                                                 }
                                             } else if (i > BASE3 - BASE2) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
+
                                             }
-                                        } else if (i % BASE == 0) {
-                                            if (i > BASE3 - BASE2) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z0,y∞,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
+                                                mody = 0;
                                             }
-                                        } else if (i > BASE3 - BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
 
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z0,y∞,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            if (i % BASE2 < BASE) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    if (i > BASE3 - BASE2) {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
 
-                                        if (i % BASE2 < BASE) {
-                                            if ((i + 1) % BASE == 0) {
-                                                if (i > BASE3 - BASE2) {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceIn[i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                    } else {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if (i >= BASE3 - BASE2) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 } else {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //    reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                if (i > BASE3 - BASE2) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 }
                                             } else if (i >= BASE3 - BASE2) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
-                                                //    reboundSpace(i, z, y, x);
+                                                //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            if (i > BASE3 - BASE2) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] = true;
+                                        } else {
+                                            //code here for z0,y∞,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i >= BASE3 - BASE2) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i > BASE3 - BASE2) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z0,y~,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z0,y~,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
                                                 //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
                                                 space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
-                                            }
-                                        } else if (i >= BASE3 - BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z0,y∞,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i >= BASE3 - BASE2) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
                                                 //}
 
+                                            }
+                                        } else {
+                                            //code here for z0,y~,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
                                             } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
                                                 //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
                                                 space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
-                                            }
-                                        } else if (i > BASE3 - BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z0,y~,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z0,y~,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z0,y~,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            } else if (z == MAXZ - 1) {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z∞,y0,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+                } else if (z == MAXZ - 1) {
+                    for (int y = 0; y < MAXY; y++) {
+                        if (y == 0) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z∞,y0,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if ((i + BASE) % BASE2 < BASE) { //on back side. example:47+5=52%25=2<5
-                                            //example: 37+5=42%25=17>5
-                                            if (i < BASE2) { //top
-                                                if (i % BASE == 0) { //left
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceIn[i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                            if ((i + BASE) % BASE2 < BASE) { //on back side. example:47+5=52%25=2<5
+                                                //example: 37+5=42%25=17>5
+                                                if (i < BASE2) { //top
+                                                    if (i % BASE == 0) { //left
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else { //back top other
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE2 - BASE) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE2 - BASE) - i] = true;
+                                                        //24+20=44-i while i=21,22,23,24
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if (i % BASE == 0) { //not top, yes left back
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
-                                                } else { //back top other
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE2 - BASE) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE2 - BASE) - i] = true;
-                                                        //24+20=44-i while i=21,22,23,24
+                                                } else { //any other back
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 }
-                                            } else if (i % BASE == 0) { //not top, yes left back
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
+                                            } else if (i < BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
 
-                                            } else { //any other back
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
+                                                } else {
+                                                    // if (i == (BASE2 - 1) - i) {
+                                                    //   space[1][z][y][x].faceIn[i] = true;
+                                                    // } else if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
 
-                                            }
-                                        } else if (i < BASE2) {
-                                            if (i % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                // if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                               // if (i == (BASE2 - 1) - i) {
-                                                //   space[1][z][y][x].faceIn[i] = true;
-                                                // } else if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i % BASE == 0) {
-                                            // if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z∞,y0,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z∞,y0,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    if ((i + 1) % BASE == 0) {
+                                                        //if (space[1][z][y][x].faceIn[i] == false) {
+                                                        space[1][z][y][x].faceIn[i] = true;
+                                                        //} else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                                    } else {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
 
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                if ((i + 1) % BASE == 0) {
-                                                    //if (space[1][z][y][x].faceIn[i] == false) {
-                                                    space[1][z][y][x].faceIn[i] = true;
+                                                    }
+                                                } else if ((i + 1) % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
                                                     //} else {
-                                                    //   reboundSpace(i, z, y, x);
+                                                    //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 } else {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z∞,y0,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
                                                     space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
                                                 }
-                                            } else if ((i + 1) % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i < BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
+                                            } else if (i < BASE2) {
                                                 //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
                                                 space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z∞,y0,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i < BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z∞,y∞,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i > BASE3 - BASE2) {
-                                                if (i % BASE == 0) {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                } else {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                }
-                                            } else if (i % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                        } else if (y == MAXY - 1) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z∞,y∞,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                                                mody = 0;
                                             }
-                                        } else if (i >= BASE3 - BASE2) {
-                                            if (i % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
 
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                                                modx = 0;
                                             }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE2 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE2 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
 
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z∞,y∞,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (((i + BASE) % BASE2) < BASE) {//back
-                                            if (i >= BASE3 - BASE2) {//bottom
-                                                if ((i + 1) % BASE == 0) {//right
-                                                    //if (space[1][z][y][x].faceIn[i] == false) {
-                                                    space[1][z][y][x].faceIn[i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                } else {
-                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
-                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                }
-                                            } else if ((i + 1) % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
                                             } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                                                modz = 0;
                                             }
-                                        } else if (i >= (BASE3 - BASE2)) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
 
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //     reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z∞,y∞,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i >= BASE3 - BASE2) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i >= BASE3 - BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z∞,y~,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //   reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z∞,y~,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z∞,y~,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z~,y0,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i < BASE2) {
-                                            if (i % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                // }
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z~,y0,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i < BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z~,y0,x~
-                                        if (i < BASE2) {
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i < BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z~,y∞,x0
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i >= BASE3 - BASE2) {
-                                            if (i % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE3 - BASE2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE3 - BASE2) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z~,y∞,x∞
-
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i >= BASE3 - BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z~,y∞,x~
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i >= BASE3 - BASE2) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[0][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[0][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z~,y~,x0
-
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z~,y~,x∞
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-                                        if ((i + 1) % BASE == 0) {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z~,y~,x~
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                        //} else {
-                                        //  reboundSpace(i, z, y, x);
-                                        //}
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        /*
-         for(int z = 0; z < MAXZ; z++){
-         for(int y = 0; y < MAXY; y++){
-         for(int x = 0; x < MAXX; x++){
-         java.util.Arrays.fill(space[0][z][y][x].faceOut, false);
-         }
-         }
-         }
-         */
-        } else {
-            for (int z = 0; z < MAXZ; z++) {
-            if (z == 0) {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z0,y0,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= (BASE3 - BASE2)) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if ((i % BASE) == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i < BASE) {
-                                                if (i % BASE == 0) {
-                                                    //  space[0][z][y][x].faceOut[i] = false;
-                                                    space[0][z][y][x].faceIn[i] = true;
-
-                                                } else if ((i + 1) % BASE == 0) {
-
-                                                    // if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
-                                                    //} else {
-                                                    //    reboundSpace(i, z, y, x);
-                                                    //}
-                                                } else if (i == (BASE - 1) - i) {
-                                                    // space[0][z][y][x].faceOut[i] = false;
-                                                    space[0][z][y][x].faceIn[i] = true;
-                                                } else {
-                                                    // if (space[0][z][y][x].faceOut[(BASE3 - 1) - i] == false) {
-                                                    space[0][z][y][x].faceIn[(BASE3 - 1) - i] = true;
-                                                    // } else {
-                                                    //    reboundSpace(i, z, y, x);
-                                                    //}
-                                                }
-                                            } else if (i % BASE == 0) {
-                                                if (i == (BASE3 - BASE2)) {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
-                                                    //} else {
-                                                    //   reboundSpace(i, z, y, x);
-                                                    //}
-                                                } else if (i == (BASE3 - BASE2) - i) {
-                                                    space[0][z][y][x].faceIn[i] = true;
-                                                } else {
-                                                    //if (space[0][z][y][x].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                    space[0][z][y][x].faceIn[(BASE3 - BASE2) - i] = true;
-                                                    //} else {
-                                                    //    reboundSpace(i, z, y, x);
-                                                    //}
-                                                }
-                                            } else if (i == (BASE3 - BASE2) + (BASE - 1) - i) {
-                                                space[0][z][y][x].faceIn[i] = true;
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i < BASE2) {
-                                            if (i % BASE == 0) {
-                                                if (i == (BASE2 - BASE) - i) {
-                                                    space[0][z][y][x].faceIn[i] = true;
-
-                                                } else {
-
-                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-                                                }
-                                            //} else if (i == (BASE2 - 1) - i) {
-                                                //  space[0][z][y][x].faceIn[i] = true;
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                //    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            if (i == (BASE3 - BASE) - i) {
-                                                space[0][z][y][x].faceIn[i] = true;
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z0,y0,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                if ((i + 1) % BASE == 0) {
-                                                    //   if (space[0][z + modz][y + mody][x + modx].faceOut[i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
-                                                   // } else {
-                                                    //   reboundSpace(i, z, y, x);
-                                                    //}
-                                                } else {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-                                                }
-                                            } else if ((i + 1) % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i < BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        }
-                                    } else {
-                                        //code here for z0,y0,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i < BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-
-                                            //}
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z0,y∞,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i % BASE == 0) {
-                                                if (i >= BASE3 - BASE2) {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceIn[i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
-                                                    //} else {
-                                                    //   reboundSpace(i, z, y, x);
-                                                    //}
-                                                } else {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-                                                }
-                                            } else if (i > BASE3 - BASE2) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            if (i > BASE3 - BASE2) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-                                            }
-                                        } else if (i > BASE3 - BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z0,y∞,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if ((i + 1) % BASE == 0) {
+                                            if ((i + BASE) % BASE2 < BASE) {
                                                 if (i > BASE3 - BASE2) {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceIn[i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                    if (i % BASE == 0) {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if (i % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 } else {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 }
                                             } else if (i >= BASE3 - BASE2) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //    reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            if (i > BASE3 - BASE2) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i >= BASE3 - BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z0,y∞,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i >= BASE3 - BASE2) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i > BASE3 - BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z0,y~,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if (i % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z0,y~,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z0,y~,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = 0;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (z == MAXZ - 1) {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z∞,y0,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) { //on back side. example:47+5=52%25=2<5
-                                            //example: 37+5=42%25=17>5
-                                            if (i < BASE2) { //top
-                                                if (i % BASE == 0) { //left
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceIn[i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                } else { //back top other
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE2 - BASE) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE2 - BASE) - i] = true;
-                                                        //24+20=44-i while i=21,22,23,24
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                }
-                                            } else if (i % BASE == 0) { //not top, yes left back
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else { //any other back
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i < BASE2) {
-                                            if (i % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                               // if (i == (BASE2 - 1) - i) {
-                                                //   space[0][z][y][x].faceIn[i] = true;
-                                                // } else if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            // if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z∞,y0,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                if ((i + 1) % BASE == 0) {
-                                                    //if (space[0][z][y][x].faceIn[i] == false) {
-                                                    space[0][z][y][x].faceIn[i] = true;
-                                                    //} else {
-                                                    //   reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                } else {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
-                                                    //} else {
-                                                    //  reboundSpace(i, z, y, x);
-                                                    //}
-
-                                                }
-                                            } else if ((i + 1) % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i < BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z∞,y0,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i < BASE2) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i < BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z∞,y∞,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i > BASE3 - BASE2) {
                                                 if (i % BASE == 0) {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - BASE) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 } else {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 }
                                             } else if (i % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE2 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE2 - BASE) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i >= BASE3 - BASE2) {
-                                            if (i % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z∞,y∞,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
+                                                mody = 0;
                                             }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE2 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE2 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
 
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z∞,y∞,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            if (((i + BASE) % BASE2) < BASE) {//back
+                                                if (i >= BASE3 - BASE2) {//bottom
+                                                    if ((i + 1) % BASE == 0) {//right
+                                                        //if (space[1][z][y][x].faceIn[i] == false) {
+                                                        space[1][z][y][x].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                                    } else {
+                                                        //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
+                                                        space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
 
-                                        if (((i + BASE) % BASE2) < BASE) {//back
-                                            if (i >= BASE3 - BASE2) {//bottom
-                                                if ((i + 1) % BASE == 0) {//right
-                                                    //if (space[0][z][y][x].faceIn[i] == false) {
-                                                    space[0][z][y][x].faceIn[i] = true;
+                                                    }
+                                                } else if ((i + 1) % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 } else {
-                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
-                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i >= (BASE3 - BASE2)) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
                                                     //} else {
                                                     //  reboundSpace(i, z, y, x);
                                                     //}
 
                                                 }
                                             } else if ((i + 1) % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
-                                                //  reboundSpace(i, z, y, x);
+                                                //     reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i >= (BASE3 - BASE2)) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                        } else {
+                                            //code here for z∞,y∞,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i >= BASE3 - BASE2) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                    //} else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i >= BASE3 - BASE2) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //     reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z∞,y∞,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i >= BASE3 - BASE2) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
-                                                //} else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i >= BASE3 - BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z∞,y~,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+                        } else {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z∞,y~,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if (i % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //   reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z∞,y~,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
-                                               // } else {
                                                 //   reboundSpace(i, z, y, x);
                                                 //}
 
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z∞,y~,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            //code here for z∞,y~,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        }
-                                    } else {
-                                        //code here for z∞,y~,x~
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 0;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
 
-                                        if ((i + BASE) % BASE2 < BASE) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
 
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            } else {
-                for (int y = 0; y < MAXY; y++) {
-                    if (y == 0) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z~,y0,x0
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
+                } else {
+                    for (int y = 0; y < MAXY; y++) {
+                        if (y == 0) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z~,y0,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if (i < BASE2) {
+                                            if (i < BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    // }
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z~,y0,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z~,y0,x~
+                                            if (i < BASE2) {
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
                                             if (i % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i < BASE2) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
-                                                // }
+                                                //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z~,y0,x∞
-                                        //mody
-                                        if (i < BASE2) { //y-
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) { //y+
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        //modx
-                                        if (i % BASE == 0) { //x-
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) { //x+
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        //modz
-                                        if (i % BASE2 < BASE) { //z-
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) { //z+
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i < BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
-                                                //}
-
-                                            } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                                //} else {
-                                                //  reboundSpace(i, z, y, x);
-                                                //}
-
-                                            }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z~,y0,x~
-                                        if (i < BASE2) {
-                                            mody = 0;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i < BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else if (y == MAXY - 1) {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z~,y∞,x0
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
+                        } else if (y == MAXY - 1) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z~,y∞,x0
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        if (i % BASE == 0) {
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i >= BASE3 - BASE2) {
                                             if (i % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE3 - BASE2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE3 - BASE2) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i >= BASE3 - BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE3 - BASE2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE3 - BASE2) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if (i % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z~,y∞,x∞
 
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z~,y∞,x∞
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            if (i >= BASE3 - BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
 
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                                } else {
+                                                    //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
 
-                                        if (i >= BASE3 - BASE2) {
-                                            if ((i + 1) % BASE == 0) {
-                                                //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
-                                               // } else {
-                                                //   reboundSpace(i, z, y, x);
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             } else {
-                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                                 //} else {
                                                 //  reboundSpace(i, z, y, x);
                                                 //}
 
                                             }
-                                        } else if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            //code here for z~,y∞,x~
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        }
-                                    } else {
-                                        //code here for z~,y∞,x~
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 0;
-                                        } else {
-                                            mody = 0;
-                                        }
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
 
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
+                                            if (i >= BASE3 - BASE2) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
 
-                                        if (i >= BASE3 - BASE2) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
 
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    } else {
-                        for (int x = 0; x < MAXX; x++) {
-                            for (int i = 0; i < BASE3; i++) {
-                                if (space[1][z][y][x].faceOut[i] == true) {
-                                    //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
-                                    space[1][z][y][x].faceOut[i] = false;
-                                    if (x == 0) {
-                                        //code here for z~,y~,x0
+                        } else {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[0][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[0][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z~,y~,x0
 
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z~,y~,x∞
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+                                            if ((i + 1) % BASE == 0) {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
                                         } else {
-                                            mody = 0;
-                                        }
+                                            //code here for z~,y~,x~
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
 
-                                        if (i % BASE == 0) {
-                                            modx = 0;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
 
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+                                            //if (space[1][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                            space[1][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
                                             //} else {
                                             //  reboundSpace(i, z, y, x);
                                             //}
 
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
                                         }
-                                    } else if (x == MAXX - 1) {
-                                        //code here for z~,y~,x∞
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 0;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-                                        if ((i + 1) % BASE == 0) {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        } else {
-                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                            //} else {
-                                            //  reboundSpace(i, z, y, x);
-                                            //}
-
-                                        }
-                                    } else {
-                                        //code here for z~,y~,x~
-                                        if (i < BASE2) {
-                                            mody = -1;
-                                        } else if (i >= BASE3 - BASE2) {
-                                            mody = 1;
-                                        } else {
-                                            mody = 0;
-                                        }
-
-                                        if (i % BASE == 0) {
-                                            modx = -1;
-                                        } else if ((i + 1) % BASE == 0) {
-                                            modx = 1;
-                                        } else {
-                                            modx = 0;
-                                        }
-
-                                        if (i % BASE2 < BASE) {
-                                            modz = -1;
-                                        } else if ((i + BASE) % BASE2 < BASE) {
-                                            modz = 1;
-                                        } else {
-                                            modz = 0;
-                                        }
-                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
-                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
-                                        //} else {
-                                        //  reboundSpace(i, z, y, x);
-                                        //}
-
                                     }
                                 }
                             }
@@ -4937,9 +3151,1872 @@ public class ColorTest implements Runnable {
                     }
                 }
             }
-        }
-            
-            
+            /*
+             for(int z = 0; z < MAXZ; z++){
+             for(int y = 0; y < MAXY; y++){
+             for(int x = 0; x < MAXX; x++){
+             java.util.Arrays.fill(space[0][z][y][x].faceOut, false);
+             }
+             }
+             }
+             */
+        } else {
+            for (int z = 0; z < MAXZ; z++) {
+                if (z == 0) {
+                    for (int y = 0; y < MAXY; y++) {
+                        if (y == 0) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z0,y0,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= (BASE3 - BASE2)) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if ((i % BASE) == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i < BASE) {
+                                                    if (i % BASE == 0) {
+                                                        //  space[0][z][y][x].faceOut[i] = false;
+                                                        space[0][z][y][x].faceIn[i] = true;
+
+                                                    } else if ((i + 1) % BASE == 0) {
+
+                                                        // if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                        //} else {
+                                                        //    reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else if (i == (BASE - 1) - i) {
+                                                        // space[0][z][y][x].faceOut[i] = false;
+                                                        space[0][z][y][x].faceIn[i] = true;
+                                                    } else {
+                                                        // if (space[0][z][y][x].faceOut[(BASE3 - 1) - i] == false) {
+                                                        space[0][z][y][x].faceIn[(BASE3 - 1) - i] = true;
+                                                        // } else {
+                                                        //    reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if (i % BASE == 0) {
+                                                    if (i == (BASE3 - BASE2)) {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                        //} else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else if (i == (BASE3 - BASE2) - i) {
+                                                        space[0][z][y][x].faceIn[i] = true;
+                                                    } else {
+                                                        //if (space[0][z][y][x].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                        space[0][z][y][x].faceIn[(BASE3 - BASE2) - i] = true;
+                                                        //} else {
+                                                        //    reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if (i == (BASE3 - BASE2) + (BASE - 1) - i) {
+                                                    space[0][z][y][x].faceIn[i] = true;
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i < BASE2) {
+                                                if (i % BASE == 0) {
+                                                    if (i == (BASE2 - BASE) - i) {
+                                                        space[0][z][y][x].faceIn[i] = true;
+
+                                                    } else {
+
+                                                        //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                    //} else if (i == (BASE2 - 1) - i) {
+                                                    //  space[0][z][y][x].faceIn[i] = true;
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    //    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                if (i == (BASE3 - BASE) - i) {
+                                                    space[0][z][y][x].faceIn[i] = true;
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z0,y0,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    if ((i + 1) % BASE == 0) {
+                                                        //   if (space[0][z + modz][y + mody][x + modx].faceOut[i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        // } else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if ((i + 1) % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+                                            }
+                                        } else {
+                                            //code here for z0,y0,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i < BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                            //} else {
+                                                //  reboundSpace(i, z, y, x);
+
+                                                //}
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (y == MAXY - 1) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z0,y∞,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i % BASE == 0) {
+                                                    if (i >= BASE3 - BASE2) {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+                                                    } else {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+                                                    }
+                                                } else if (i > BASE3 - BASE2) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                if (i > BASE3 - BASE2) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+                                                }
+                                            } else if (i > BASE3 - BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z0,y∞,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    if (i > BASE3 - BASE2) {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if (i >= BASE3 - BASE2) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //    reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                if (i > BASE3 - BASE2) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + ((BASE3 - BASE2) + (BASE - 1)) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i >= BASE3 - BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z0,y∞,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i >= BASE3 - BASE2) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[((BASE3 - BASE2) * 2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[((BASE3 - BASE2) * 2) + (BASE - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i > BASE3 - BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z0,y~,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z0,y~,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + ((BASE - 1) * 2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z0,y~,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = 0;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (z == MAXZ - 1) {
+                    for (int y = 0; y < MAXY; y++) {
+                        if (y == 0) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z∞,y0,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) { //on back side. example:47+5=52%25=2<5
+                                                //example: 37+5=42%25=17>5
+                                                if (i < BASE2) { //top
+                                                    if (i % BASE == 0) { //left
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceIn[i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else { //back top other
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE2 - BASE) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE2 - BASE) - i] = true;
+                                                        //24+20=44-i while i=21,22,23,24
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if (i % BASE == 0) { //not top, yes left back
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else { //any other back
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i < BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    // if (i == (BASE2 - 1) - i) {
+                                                    //   space[0][z][y][x].faceIn[i] = true;
+                                                    // } else if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                // if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z∞,y0,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    if ((i + 1) % BASE == 0) {
+                                                        //if (space[0][z][y][x].faceIn[i] == false) {
+                                                        space[0][z][y][x].faceIn[i] = true;
+                                                        //} else {
+                                                        //   reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if ((i + 1) % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z∞,y0,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i < BASE2) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i < BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (y == MAXY - 1) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z∞,y∞,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i > BASE3 - BASE2) {
+                                                    if (i % BASE == 0) {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if (i % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i >= BASE3 - BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE3 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE3 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE2) + (BASE2 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE2) + (BASE2 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z∞,y∞,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (((i + BASE) % BASE2) < BASE) {//back
+                                                if (i >= BASE3 - BASE2) {//bottom
+                                                    if ((i + 1) % BASE == 0) {//right
+                                                        //if (space[0][z][y][x].faceIn[i] == false) {
+                                                        space[0][z][y][x].faceIn[i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    } else {
+                                                        //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
+                                                        space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                        //} else {
+                                                        //  reboundSpace(i, z, y, x);
+                                                        //}
+
+                                                    }
+                                                } else if ((i + 1) % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i >= (BASE3 - BASE2)) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //     reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z∞,y∞,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i >= BASE3 - BASE2) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE) - i] = true;
+                                                    //} else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i >= BASE3 - BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z∞,y~,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //   reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z∞,y~,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z∞,y~,x~
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 0;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if ((i + BASE) % BASE2 < BASE) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE2 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE2 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    for (int y = 0; y < MAXY; y++) {
+                        if (y == 0) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z~,y0,x0
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i < BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - BASE) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - BASE) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    // }
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z~,y0,x∞
+                                            //mody
+                                            if (i < BASE2) { //y-
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) { //y+
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            //modx
+                                            if (i % BASE == 0) { //x-
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) { //x+
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            //modz
+                                            if (i % BASE2 < BASE) { //z-
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) { //z+
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i < BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) + (BASE - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z~,y0,x~
+                                            if (i < BASE2) {
+                                                mody = 0;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i < BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE2 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE2 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (y == MAXY - 1) {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z~,y∞,x0
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i >= BASE3 - BASE2) {
+                                                if (i % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) + (BASE3 - BASE2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) + (BASE3 - BASE2) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if (i % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z~,y∞,x∞
+
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i >= BASE3 - BASE2) {
+                                                if ((i + 1) % BASE == 0) {
+                                                    //  if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) + (BASE - 1) - i] = true;
+                                                    // } else {
+                                                    //   reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                } else {
+                                                    //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                    space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                    //} else {
+                                                    //  reboundSpace(i, z, y, x);
+                                                    //}
+
+                                                }
+                                            } else if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z~,y∞,x~
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 0;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i >= BASE3 - BASE2) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE3 - BASE2) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE3 - BASE2) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int x = 0; x < MAXX; x++) {
+                                for (int i = 0; i < BASE3; i++) {
+                                    if (space[1][z][y][x].faceOut[i] == true) {
+                                        //System.out.println("Now processing space[0][" + z + "][" + y + "][" + x + "].faceOut[" + i + "].");
+                                        space[1][z][y][x].faceOut[i] = false;
+                                        if (x == 0) {
+                                            //code here for z~,y~,x0
+
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = 0;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - BASE) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - BASE) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else if (x == MAXX - 1) {
+                                            //code here for z~,y~,x∞
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 0;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+                                            if ((i + 1) % BASE == 0) {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) + (BASE - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) + (BASE - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            } else {
+                                                //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                                space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                                //} else {
+                                                //  reboundSpace(i, z, y, x);
+                                                //}
+
+                                            }
+                                        } else {
+                                            //code here for z~,y~,x~
+                                            if (i < BASE2) {
+                                                mody = -1;
+                                            } else if (i >= BASE3 - BASE2) {
+                                                mody = 1;
+                                            } else {
+                                                mody = 0;
+                                            }
+
+                                            if (i % BASE == 0) {
+                                                modx = -1;
+                                            } else if ((i + 1) % BASE == 0) {
+                                                modx = 1;
+                                            } else {
+                                                modx = 0;
+                                            }
+
+                                            if (i % BASE2 < BASE) {
+                                                modz = -1;
+                                            } else if ((i + BASE) % BASE2 < BASE) {
+                                                modz = 1;
+                                            } else {
+                                                modz = 0;
+                                            }
+                                            //if (space[0][z + modz][y + mody][x + modx].faceOut[(BASE3 - 1) - i] == false) {
+                                            space[0][z + modz][y + mody][x + modx].faceIn[(BASE3 - 1) - i] = true;
+                                            //} else {
+                                            //  reboundSpace(i, z, y, x);
+                                            //}
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 
