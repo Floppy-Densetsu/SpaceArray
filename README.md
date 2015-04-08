@@ -4,7 +4,9 @@ A system which passes data around between Boolean arrays within a 3D array. Inte
 Sorry that the whole thing is a mess. There is a lot of unused code that had convoluted purposes which don't necessarily apply now.
 The display systems are difficult to explain as well. The one Test uses shows each location spread out with 0-24 in a row, then 25-49 in the next row down, then 50-74 in the row below that one, 75-99 beneath that, and 100-124 in the fifth row down from the first. Then it starts again with the next space along the Y axis. To the right of each of these, the next X space starts and does the same thing.
 
-So you have Y0,X0:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24, then Y0,X1:0,1,2,3,4,5,6, etc.
+So you have 
+
+            Y0,X0:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24, then Y0,X1:0,1,2,3,4,5,6, etc.
             Y0,X0:25,26,27,28,29,30...
             Y0,X0:50,51,52,53,54,55,56,57,58...
             ...
